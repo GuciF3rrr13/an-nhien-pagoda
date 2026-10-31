@@ -1,0 +1,5 @@
+{
+  "name": "@temple/server",
+  "private": true,
+  "type": "module"
+}

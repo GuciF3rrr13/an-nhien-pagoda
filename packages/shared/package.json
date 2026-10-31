@@ -1,0 +1,5 @@
+{
+  "name": "@temple/shared",
+  "private": true,
+  "type": "module"
+}

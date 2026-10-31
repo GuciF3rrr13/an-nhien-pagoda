@@ -1,0 +1,601 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-31T06:23:38.713786+00:00",
+  "title": "Design System: Chùa An Nhiên LIVE",
+  "extensions": {
+    "colorMeta": {
+      "jade-primary": {
+        "role": "primary",
+        "displayName": "Jade Primary",
+        "canonical": "#224e37",
+        "tonalRamp": [
+          "oklch(15.0% 0.0237 158.57)",
+          "oklch(26.4% 0.0418 158.57)",
+          "oklch(37.9% 0.0600 158.57)",
+          "oklch(49.3% 0.0633 158.57)",
+          "oklch(60.7% 0.0633 158.57)",
+          "oklch(72.1% 0.0589 158.57)",
+          "oklch(83.6% 0.0346 158.57)",
+          "oklch(95.0% 0.0105 158.57)"
+        ]
+      },
+      "jade-hover": {
+        "role": "primary",
+        "displayName": "Jade Hover",
+        "canonical": "#183e2a",
+        "tonalRamp": [
+          "oklch(15.0% 0.0212 158.08)",
+          "oklch(26.4% 0.0373 158.08)",
+          "oklch(37.9% 0.0536 158.08)",
+          "oklch(49.3% 0.0565 158.08)",
+          "oklch(60.7% 0.0565 158.08)",
+          "oklch(72.1% 0.0526 158.08)",
+          "oklch(83.6% 0.0309 158.08)",
+          "oklch(95.0% 0.0094 158.08)"
+        ]
+      },
+      "jade-navigation": {
+        "role": "primary",
+        "displayName": "Jade Navigation",
+        "canonical": "#19382c",
+        "tonalRamp": [
+          "oklch(15.0% 0.0162 166.31)",
+          "oklch(26.4% 0.0286 166.31)",
+          "oklch(37.9% 0.0410 166.31)",
+          "oklch(49.3% 0.0433 166.31)",
+          "oklch(60.7% 0.0433 166.31)",
+          "oklch(72.1% 0.0403 166.31)",
+          "oklch(83.6% 0.0237 166.31)",
+          "oklch(95.0% 0.0072 166.31)"
+        ]
+      },
+      "jade-navigation-hover": {
+        "role": "primary",
+        "displayName": "Jade Navigation Hover",
+        "canonical": "#244837",
+        "tonalRamp": [
+          "oklch(15.0% 0.0193 161.92)",
+          "oklch(26.4% 0.0340 161.92)",
+          "oklch(37.9% 0.0488 161.92)",
+          "oklch(49.3% 0.0515 161.92)",
+          "oklch(60.7% 0.0515 161.92)",
+          "oklch(72.1% 0.0479 161.92)",
+          "oklch(83.6% 0.0282 161.92)",
+          "oklch(95.0% 0.0086 161.92)"
+        ]
+      },
+      "jade-active-text": {
+        "role": "primary",
+        "displayName": "Jade Active Text",
+        "canonical": "#224632",
+        "tonalRamp": [
+          "oklch(15.0% 0.0205 157.75)",
+          "oklch(26.4% 0.0361 157.75)",
+          "oklch(37.9% 0.0519 157.75)",
+          "oklch(49.3% 0.0548 157.75)",
+          "oklch(60.7% 0.0548 157.75)",
+          "oklch(72.1% 0.0509 157.75)",
+          "oklch(83.6% 0.0299 157.75)",
+          "oklch(95.0% 0.0091 157.75)"
+        ]
+      },
+      "ivory-background": {
+        "role": "neutral",
+        "displayName": "Ivory Background",
+        "canonical": "#f5f3ec",
+        "tonalRamp": [
+          "oklch(15.0% 0.0036 93.57)",
+          "oklch(26.4% 0.0063 93.57)",
+          "oklch(37.9% 0.0090 93.57)",
+          "oklch(49.3% 0.0095 93.57)",
+          "oklch(60.7% 0.0095 93.57)",
+          "oklch(72.1% 0.0089 93.57)",
+          "oklch(83.6% 0.0052 93.57)",
+          "oklch(95.0% 0.0016 93.57)"
+        ]
+      },
+      "ivory-paper": {
+        "role": "neutral",
+        "displayName": "Ivory Paper",
+        "canonical": "#fffcf6",
+        "tonalRamp": [
+          "oklch(15.0% 0.0032 84.57)",
+          "oklch(26.4% 0.0056 84.57)",
+          "oklch(37.9% 0.0081 84.57)",
+          "oklch(49.3% 0.0085 84.57)",
+          "oklch(60.7% 0.0085 84.57)",
+          "oklch(72.1% 0.0079 84.57)",
+          "oklch(83.6% 0.0047 84.57)",
+          "oklch(95.0% 0.0014 84.57)"
+        ]
+      },
+      "ivory-button": {
+        "role": "neutral",
+        "displayName": "Ivory Button",
+        "canonical": "#fffdf2",
+        "tonalRamp": [
+          "oklch(15.0% 0.0055 98.28)",
+          "oklch(26.4% 0.0096 98.28)",
+          "oklch(37.9% 0.0138 98.28)",
+          "oklch(49.3% 0.0146 98.28)",
+          "oklch(60.7% 0.0146 98.28)",
+          "oklch(72.1% 0.0136 98.28)",
+          "oklch(83.6% 0.0080 98.28)",
+          "oklch(95.0% 0.0024 98.28)"
+        ]
+      },
+      "ivory-active": {
+        "role": "neutral",
+        "displayName": "Ivory Active",
+        "canonical": "#edf0e1",
+        "tonalRamp": [
+          "oklch(15.0% 0.0075 115.97)",
+          "oklch(26.4% 0.0133 115.97)",
+          "oklch(37.9% 0.0190 115.97)",
+          "oklch(49.3% 0.0201 115.97)",
+          "oklch(60.7% 0.0201 115.97)",
+          "oklch(72.1% 0.0187 115.97)",
+          "oklch(83.6% 0.0110 115.97)",
+          "oklch(95.0% 0.0034 115.97)"
+        ]
+      },
+      "ivory-hover": {
+        "role": "neutral",
+        "displayName": "Ivory Hover",
+        "canonical": "#edf0e4",
+        "tonalRamp": [
+          "oklch(15.0% 0.0061 118.13)",
+          "oklch(26.4% 0.0107 118.13)",
+          "oklch(37.9% 0.0154 118.13)",
+          "oklch(49.3% 0.0162 118.13)",
+          "oklch(60.7% 0.0162 118.13)",
+          "oklch(72.1% 0.0151 118.13)",
+          "oklch(83.6% 0.0089 118.13)",
+          "oklch(95.0% 0.0027 118.13)"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "#25372f",
+        "tonalRamp": [
+          "oklch(15.0% 0.0103 165.44)",
+          "oklch(26.4% 0.0181 165.44)",
+          "oklch(37.9% 0.0261 165.44)",
+          "oklch(49.3% 0.0275 165.44)",
+          "oklch(60.7% 0.0275 165.44)",
+          "oklch(72.1% 0.0256 165.44)",
+          "oklch(83.6% 0.0150 165.44)",
+          "oklch(95.0% 0.0046 165.44)"
+        ]
+      },
+      "secondary-ink": {
+        "role": "neutral",
+        "displayName": "Secondary Ink",
+        "canonical": "#607054",
+        "tonalRamp": [
+          "oklch(15.0% 0.0175 132.08)",
+          "oklch(26.4% 0.0309 132.08)",
+          "oklch(37.9% 0.0443 132.08)",
+          "oklch(49.3% 0.0467 132.08)",
+          "oklch(60.7% 0.0467 132.08)",
+          "oklch(72.1% 0.0435 132.08)",
+          "oklch(83.6% 0.0256 132.08)",
+          "oklch(95.0% 0.0078 132.08)"
+        ]
+      },
+      "muted-ink": {
+        "role": "neutral",
+        "displayName": "Muted Ink",
+        "canonical": "#627168",
+        "tonalRamp": [
+          "oklch(15.0% 0.0085 159.22)",
+          "oklch(26.4% 0.0150 159.22)",
+          "oklch(37.9% 0.0216 159.22)",
+          "oklch(49.3% 0.0228 159.22)",
+          "oklch(60.7% 0.0228 159.22)",
+          "oklch(72.1% 0.0212 159.22)",
+          "oklch(83.6% 0.0124 159.22)",
+          "oklch(95.0% 0.0038 159.22)"
+        ]
+      },
+      "navigation-ink": {
+        "role": "neutral",
+        "displayName": "Navigation Ink",
+        "canonical": "#c5d0c1",
+        "tonalRamp": [
+          "oklch(15.0% 0.0089 137.26)",
+          "oklch(26.4% 0.0157 137.26)",
+          "oklch(37.9% 0.0225 137.26)",
+          "oklch(49.3% 0.0237 137.26)",
+          "oklch(60.7% 0.0237 137.26)",
+          "oklch(72.1% 0.0221 137.26)",
+          "oklch(83.6% 0.0130 137.26)",
+          "oklch(95.0% 0.0040 137.26)"
+        ]
+      },
+      "secondary-button-ink": {
+        "role": "neutral",
+        "displayName": "Secondary Button Ink",
+        "canonical": "#364c3e",
+        "tonalRamp": [
+          "oklch(15.0% 0.0136 156.42)",
+          "oklch(26.4% 0.0239 156.42)",
+          "oklch(37.9% 0.0343 156.42)",
+          "oklch(49.3% 0.0362 156.42)",
+          "oklch(60.7% 0.0362 156.42)",
+          "oklch(72.1% 0.0336 156.42)",
+          "oklch(83.6% 0.0198 156.42)",
+          "oklch(95.0% 0.0060 156.42)"
+        ]
+      },
+      "divider": {
+        "role": "neutral",
+        "displayName": "Divider",
+        "canonical": "#e2e3d9",
+        "tonalRamp": [
+          "oklch(15.0% 0.0050 111.29)",
+          "oklch(26.4% 0.0089 111.29)",
+          "oklch(37.9% 0.0127 111.29)",
+          "oklch(49.3% 0.0134 111.29)",
+          "oklch(60.7% 0.0134 111.29)",
+          "oklch(72.1% 0.0125 111.29)",
+          "oklch(83.6% 0.0073 111.29)",
+          "oklch(95.0% 0.0022 111.29)"
+        ]
+      },
+      "panel-border": {
+        "role": "neutral",
+        "displayName": "Panel Border",
+        "canonical": "#e2e4d8",
+        "tonalRamp": [
+          "oklch(15.0% 0.0061 114.39)",
+          "oklch(26.4% 0.0107 114.39)",
+          "oklch(37.9% 0.0153 114.39)",
+          "oklch(49.3% 0.0162 114.39)",
+          "oklch(60.7% 0.0162 114.39)",
+          "oklch(72.1% 0.0151 114.39)",
+          "oklch(83.6% 0.0088 114.39)",
+          "oklch(95.0% 0.0027 114.39)"
+        ]
+      },
+      "button-border": {
+        "role": "neutral",
+        "displayName": "Button Border",
+        "canonical": "#dce0d4",
+        "tonalRamp": [
+          "oklch(15.0% 0.0063 121.79)",
+          "oklch(26.4% 0.0110 121.79)",
+          "oklch(37.9% 0.0158 121.79)",
+          "oklch(49.3% 0.0167 121.79)",
+          "oklch(60.7% 0.0167 121.79)",
+          "oklch(72.1% 0.0155 121.79)",
+          "oklch(83.6% 0.0091 121.79)",
+          "oklch(95.0% 0.0028 121.79)"
+        ]
+      },
+      "field-background": {
+        "role": "neutral",
+        "displayName": "Field Background",
+        "canonical": "#fffefa",
+        "tonalRamp": [
+          "oklch(15.0% 0.0020 95.10)",
+          "oklch(26.4% 0.0035 95.10)",
+          "oklch(37.9% 0.0051 95.10)",
+          "oklch(49.3% 0.0054 95.10)",
+          "oklch(60.7% 0.0054 95.10)",
+          "oklch(72.1% 0.0050 95.10)",
+          "oklch(83.6% 0.0029 95.10)",
+          "oklch(95.0% 0.0009 95.10)"
+        ]
+      },
+      "field-border": {
+        "role": "neutral",
+        "displayName": "Field Border",
+        "canonical": "#dce0d3",
+        "tonalRamp": [
+          "oklch(15.0% 0.0067 120.71)",
+          "oklch(26.4% 0.0119 120.71)",
+          "oklch(37.9% 0.0170 120.71)",
+          "oklch(49.3% 0.0180 120.71)",
+          "oklch(60.7% 0.0180 120.71)",
+          "oklch(72.1% 0.0167 120.71)",
+          "oklch(83.6% 0.0098 120.71)",
+          "oklch(95.0% 0.0030 120.71)"
+        ]
+      },
+      "field-ink": {
+        "role": "neutral",
+        "displayName": "Field Ink",
+        "canonical": "#304832",
+        "tonalRamp": [
+          "oklch(15.0% 0.0179 146.61)",
+          "oklch(26.4% 0.0314 146.61)",
+          "oklch(37.9% 0.0451 146.61)",
+          "oklch(49.3% 0.0476 146.61)",
+          "oklch(60.7% 0.0476 146.61)",
+          "oklch(72.1% 0.0443 146.61)",
+          "oklch(83.6% 0.0260 146.61)",
+          "oklch(95.0% 0.0079 146.61)"
+        ]
+      },
+      "tag-background": {
+        "role": "neutral",
+        "displayName": "Tag Background",
+        "canonical": "#edefe4",
+        "tonalRamp": [
+          "oklch(15.0% 0.0055 115.04)",
+          "oklch(26.4% 0.0097 115.04)",
+          "oklch(37.9% 0.0140 115.04)",
+          "oklch(49.3% 0.0147 115.04)",
+          "oklch(60.7% 0.0147 115.04)",
+          "oklch(72.1% 0.0137 115.04)",
+          "oklch(83.6% 0.0081 115.04)",
+          "oklch(95.0% 0.0025 115.04)"
+        ]
+      },
+      "tag-ink": {
+        "role": "neutral",
+        "displayName": "Tag Ink",
+        "canonical": "#59684d",
+        "tonalRamp": [
+          "oklch(15.0% 0.0170 131.55)",
+          "oklch(26.4% 0.0300 131.55)",
+          "oklch(37.9% 0.0430 131.55)",
+          "oklch(49.3% 0.0454 131.55)",
+          "oklch(60.7% 0.0454 131.55)",
+          "oklch(72.1% 0.0422 131.55)",
+          "oklch(83.6% 0.0248 131.55)",
+          "oklch(95.0% 0.0076 131.55)"
+        ]
+      },
+      "focus-bronze": {
+        "role": "secondary",
+        "displayName": "Focus Bronze",
+        "canonical": "#a88649",
+        "tonalRamp": [
+          "oklch(15.0% 0.0336 80.66)",
+          "oklch(26.4% 0.0591 80.66)",
+          "oklch(37.9% 0.0848 80.66)",
+          "oklch(49.3% 0.0895 80.66)",
+          "oklch(60.7% 0.0895 80.66)",
+          "oklch(72.1% 0.0832 80.66)",
+          "oklch(83.6% 0.0489 80.66)",
+          "oklch(95.0% 0.0149 80.66)"
+        ]
+      },
+      "temple-title": {
+        "role": "secondary",
+        "displayName": "Temple Title",
+        "canonical": "#ffe2a0",
+        "tonalRamp": [
+          "oklch(15.0% 0.0335 86.88)",
+          "oklch(26.4% 0.0589 86.88)",
+          "oklch(37.9% 0.0845 86.88)",
+          "oklch(49.3% 0.0892 86.88)",
+          "oklch(60.7% 0.0892 86.88)",
+          "oklch(72.1% 0.0830 86.88)",
+          "oklch(83.6% 0.0488 86.88)",
+          "oklch(95.0% 0.0149 86.88)"
+        ]
+      },
+      "temple-ink": {
+        "role": "secondary",
+        "displayName": "Temple Ink",
+        "canonical": "#fff1d0",
+        "tonalRamp": [
+          "oklch(15.0% 0.0171 87.76)",
+          "oklch(26.4% 0.0301 87.76)",
+          "oklch(37.9% 0.0432 87.76)",
+          "oklch(49.3% 0.0456 87.76)",
+          "oklch(60.7% 0.0456 87.76)",
+          "oklch(72.1% 0.0424 87.76)",
+          "oklch(83.6% 0.0249 87.76)",
+          "oklch(95.0% 0.0076 87.76)"
+        ]
+      },
+      "temple-gold": {
+        "role": "secondary",
+        "displayName": "Temple Gold",
+        "canonical": "#f4d593",
+        "tonalRamp": [
+          "oklch(15.0% 0.0339 85.46)",
+          "oklch(26.4% 0.0597 85.46)",
+          "oklch(37.9% 0.0858 85.46)",
+          "oklch(49.3% 0.0905 85.46)",
+          "oklch(60.7% 0.0905 85.46)",
+          "oklch(72.1% 0.0842 85.46)",
+          "oklch(83.6% 0.0495 85.46)",
+          "oklch(95.0% 0.0151 85.46)"
+        ]
+      },
+      "temple-progress": {
+        "role": "secondary",
+        "displayName": "Temple Progress",
+        "canonical": "#d4af63",
+        "tonalRamp": [
+          "oklch(15.0% 0.0391 83.99)",
+          "oklch(26.4% 0.0688 83.99)",
+          "oklch(37.9% 0.0988 83.99)",
+          "oklch(49.3% 0.1042 83.99)",
+          "oklch(60.7% 0.1042 83.99)",
+          "oklch(72.1% 0.0969 83.99)",
+          "oklch(83.6% 0.0570 83.99)",
+          "oklch(95.0% 0.0174 83.99)"
+        ]
+      },
+      "temple-panel": {
+        "role": "secondary",
+        "displayName": "Temple Panel",
+        "canonical": "#231d13c9",
+        "tonalRamp": [
+          "oklch(15.0% 0.0076 80.18)",
+          "oklch(26.4% 0.0134 80.18)",
+          "oklch(37.9% 0.0192 80.18)",
+          "oklch(49.3% 0.0203 80.18)",
+          "oklch(60.7% 0.0203 80.18)",
+          "oklch(72.1% 0.0189 80.18)",
+          "oklch(83.6% 0.0111 80.18)",
+          "oklch(95.0% 0.0034 80.18)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Temple display",
+        "purpose": "Portrait temple title, scaled to the container."
+      },
+      "headline": {
+        "displayName": "Operator headline",
+        "purpose": "Admin page heading."
+      },
+      "title": {
+        "displayName": "Section title",
+        "purpose": "Lora section titles; panel size overrides are documented in DESIGN.md."
+      },
+      "body": {
+        "displayName": "Body baseline",
+        "purpose": "Be Vietnam Pro root baseline; explicit compact sizes appear in controls."
+      },
+      "label": {
+        "displayName": "Button label",
+        "purpose": "Final shared button typography after contrast corrections."
+      }
+    },
+    "shadows": [
+      {
+        "name": "portrait-preview",
+        "value": "0 15px 40px #33270d20",
+        "purpose": "Structural lift for the preview frame."
+      },
+      {
+        "name": "selected-camera",
+        "value": "0 1px 4px #20392712",
+        "purpose": "Selected segment only."
+      },
+      {
+        "name": "toast",
+        "value": "0 8px 30px #162f2930",
+        "purpose": "Transient operation feedback."
+      }
+    ],
+    "motion": [
+      {
+        "name": "control-state",
+        "value": "0.15s",
+        "purpose": "Existing button, navigation, action and border transitions."
+      },
+      {
+        "name": "progress-fill",
+        "value": "width 0.5s",
+        "purpose": "Temple progress change; CSS transitions disabled by prefers-reduced-motion."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "wide-desktop-min",
+        "value": "1600px"
+      },
+      {
+        "name": "compact-desktop-max",
+        "value": "1200px"
+      },
+      {
+        "name": "narrow-desktop-max",
+        "value": "1000px"
+      },
+      {
+        "name": "mobile-max",
+        "value": "760px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Implemented operator action; final shared label size and enabled hover behavior.",
+      "html": "<button class=\"ds-primary\">Chạy mô phỏng</button>",
+      "css": ".ds-primary{font-family:\"Be Vietnam Pro\",sans-serif;display:inline-flex;justify-content:center;align-items:center;gap:8px;min-height:38px;border:1px solid transparent;border-radius:7px;padding:9px 14px;font-size:12px;font-weight:500;transition:background .15s,transform .15s;text-align:center;line-height:1.5;cursor:pointer;background:#224e37;color:#fffdf2;border-color:transparent;} .ds-primary:hover:not(:disabled){background:#183e2a;transform:translateY(-1px);} .ds-primary:focus-visible{outline:3px solid #a88649;outline-offset:4px;} .ds-primary:disabled{cursor:not-allowed;opacity:.5;} @media(prefers-reduced-motion:reduce){.ds-primary{transition:none;}}"
+    },
+    {
+      "name": "Secondary button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Implemented operator action; final shared label size and enabled hover behavior.",
+      "html": "<button class=\"ds-secondary\">Sao chép</button>",
+      "css": ".ds-secondary{font-family:\"Be Vietnam Pro\",sans-serif;display:inline-flex;justify-content:center;align-items:center;gap:8px;min-height:38px;border:1px solid transparent;border-radius:7px;padding:9px 14px;font-size:12px;font-weight:500;transition:background .15s,transform .15s;text-align:center;line-height:1.5;cursor:pointer;background:#fffcf6;color:#364c3e;border-color:#dce0d4;} .ds-secondary:hover:not(:disabled){background:#edf0e4;transform:translateY(-1px);} .ds-secondary:focus-visible{outline:3px solid #a88649;outline-offset:4px;} .ds-secondary:disabled{cursor:not-allowed;opacity:.5;} @media(prefers-reduced-motion:reduce){.ds-secondary{transition:none;}}"
+    },
+    {
+      "name": "Visitor name field",
+      "kind": "input",
+      "refersTo": "field",
+      "description": "Compact labeled operator text field with the final placeholder contrast.",
+      "html": "<label class=\"ds-label\" for=\"ds-name\">Tên khách</label><input class=\"ds-field\" id=\"ds-name\" placeholder=\"Nhập tên khách\" value=\"Minh An\">",
+      "css": ".ds-label{font-family:\"Be Vietnam Pro\",sans-serif;font-size:11px;color:#54624f;display:block;margin-bottom:7px;} .ds-field{font-family:\"Be Vietnam Pro\",sans-serif;width:100%;background:#fffefa;border:1px solid #dce0d3;border-radius:6px;padding:9px 11px;font-size:11px;min-height:36px;color:#304832;caret-color:#295f41;transition:border-color .15s;} .ds-field::placeholder{color:#607054;} .ds-field:focus{border-color:#65856c;outline:2px solid #dee8d6;outline-offset:0;} @media(prefers-reduced-motion:reduce){.ds-field{transition:none;}}"
+    },
+    {
+      "name": "Operator navigation",
+      "kind": "nav",
+      "refersTo": "navigation",
+      "description": "Desktop jade navigation with an ivory current page and the actual LayoutDashboard SVG.",
+      "html": "<div class=\"ds-sidebar\"><nav class=\"ds-nav\" aria-label=\"Điều hướng quản trị\"><button class=\"ds-nav-item ds-active\" aria-current=\"page\"><svg width=\"19\" height=\"19\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect width=\"7\" height=\"9\" x=\"3\" y=\"3\" rx=\"1\"/><rect width=\"7\" height=\"5\" x=\"14\" y=\"3\" rx=\"1\"/><rect width=\"7\" height=\"9\" x=\"14\" y=\"12\" rx=\"1\"/><rect width=\"7\" height=\"5\" x=\"3\" y=\"16\" rx=\"1\"/></svg><span>Phòng điều khiển</span></button><button class=\"ds-nav-item\">Lời cầu nguyện</button></nav></div>",
+      "css": ".ds-sidebar{background:#19382c;padding:34px 20px 24px;} .ds-nav{display:grid;gap:8px;} .ds-nav-item{font-family:\"Be Vietnam Pro\",sans-serif;display:flex;align-items:center;gap:12px;width:100%;padding:13px 14px;background:none;border:none;border-radius:9px;color:#c5d0c1;text-align:left;font-size:12px;min-height:46px;transition:background .15s;cursor:pointer;} .ds-nav-item svg{flex-shrink:0;} .ds-nav-item:hover{background:#244837;color:#fff;} .ds-nav-item.ds-active{background:#edf0e1;color:#224632;font-weight:600;} .ds-nav-item:focus-visible{outline:3px solid #a88649;outline-offset:4px;} @media(max-width:760px){.ds-nav{display:flex;gap:5px;overflow:auto;} .ds-nav-item{width:auto;flex:1;justify-content:center;white-space:nowrap;padding:11px 9px;gap:6px;font-size:10px;border-radius:7px 7px 0 0;min-height:41px;} .ds-nav-item.ds-active{background:#f5f3ec;} .ds-nav-item svg{width:16px;height:16px;}} @media(prefers-reduced-motion:reduce){.ds-nav-item{transition:none;}}"
+    },
+    {
+      "name": "Local tag",
+      "kind": "chip",
+      "refersTo": "tag",
+      "description": "Static context tag, including the final corrected text color.",
+      "html": "<span class=\"ds-tag\">Cục bộ</span>",
+      "css": ".ds-tag{font-family:\"Be Vietnam Pro\",sans-serif;display:inline-flex;padding:4px 7px;font-size:9px;color:#59684d;background:#edefe4;border-radius:4px;font-weight:400;}"
+    },
+    {
+      "name": "Operator panel",
+      "kind": "card",
+      "refersTo": "panel",
+      "description": "Paper panel and actual heading/description styling; border provides separation without a shadow.",
+      "html": "<section class=\"ds-panel\"><h2>Tương tác thử</h2><p>Gửi một tương tác để xem ngôi chùa chuyển động.</p></section>",
+      "css": ".ds-panel{font-family:\"Be Vietnam Pro\",sans-serif;background:var(--paper,#fffcf6);border:1px solid #e2e4d8;border-radius:12px;padding:23px;} .ds-panel h2{font-family:\"Lora\",serif;font-size:18px;font-weight:500;letter-spacing:-.015em;color:#25372f;margin:0;} .ds-panel p{font-size:11px;color:#607054;line-height:1.8;margin:10px 0 18px;max-width:72ch;} @media(min-width:1600px){.ds-panel{padding:27px;}} @media(max-width:1200px){.ds-panel{padding:18px;}} @media(max-width:1000px){.ds-panel{padding:15px;}} @media(max-width:760px){.ds-panel{padding:22px;} .ds-panel h2{font-size:19px;}}"
+    },
+    {
+      "name": "Shared temple progress",
+      "kind": "custom",
+      "refersTo": "temple-progress",
+      "description": "Container-scaled temple progress at 120 / 250; semantic progressbar and actual source proportions.",
+      "html": "<div class=\"ds-temple\"><div class=\"ds-progress\"><div class=\"ds-progress-row\"><span>Cùng thắp sáng chánh điện</span><strong>120 <small>/ 250</small></strong></div><div class=\"ds-track\" role=\"progressbar\" aria-label=\"Công đức chung\" aria-valuemin=\"0\" aria-valuemax=\"250\" aria-valuenow=\"120\"><span style=\"width:48%\"></span></div></div></div>",
+      "css": ".ds-temple{font-family:\"Be Vietnam Pro\",sans-serif;container-type:inline-size;color:#fff1d0;} .ds-progress{background:#231d13c9;border:1px solid #97754880;padding:3cqw 3.5cqw;border-radius:7px;} .ds-progress-row{display:flex;justify-content:space-between;gap:8px;align-items:center;font-size:2.3cqw;} .ds-progress strong{font-size:3.4cqw;color:#f4d593;font-weight:500;font-variant-numeric:tabular-nums;} .ds-progress small{font-size:2.4cqw;color:#bba47c;font-weight:400;} .ds-track{height:3px;background:#6a513464;margin-top:2.5cqw;overflow:hidden;border-radius:2px;} .ds-track>span{display:block;height:100%;background:#d4af63;transition:width .5s;} @media(prefers-reduced-motion:reduce){.ds-track>span{transition:none;}}"
+    }
+  ],
+  "narrative": {
+    "northStar": "Chùa An Nhiên",
+    "overview": "The approved [temple concept](docs/reference/temple-concept.png) remains the visual authority: an ornate golden Vietnamese altar, warm lanterns, dark carved teak, red prayer carpets and a kneeling congregation. Painted layered 2.5D artwork gives the temple its richness; Vietnamese labels and simple effects are rendered in code with smooth raster filtering.\n\nThe operator interface provides quiet ivory paper and deep jade navigation around the portrait preview. Restrained bronze details and Lora headings connect it to the temple while familiar Be Vietnam Pro controls keep operation legible and calm. This document records the implemented system, including the final small-text contrast corrections.",
+    "keyCharacteristics": [
+      "Golden painted temple with an altar focal point and layered congregation.",
+      "Quiet ivory and jade operator surfaces with restrained ornament.",
+      "Vietnamese typography, clear focus states and truthful connection labels."
+    ],
+    "rules": [
+      {
+        "name": "The Reference Rule",
+        "body": "Preserve the approved golden temple artwork and its warm lighting when adding visual assets.",
+        "section": "colors"
+      }
+    ],
+    "dos": [
+      "**Do** preserve the approved painted altar, warm lanterns, red carpets and congregation.",
+      "**Do** use Lora for temple/section titles and Be Vietnam Pro for Vietnamese controls.",
+      "**Do** keep connection state truthful and distinguish simulated interactions in visible copy.",
+      "**Do** retain visible keyboard focus, final contrast corrections and portrait proportions.",
+      "**Do** inspect generated art at native scale and inside the engine before accepting it."
+    ],
+    "donts": [
+      "**Don't** substitute pixel art or enable pixel-art filtering.",
+      "**Don't** bake labels, counters or controls into generated artwork.",
+      "**Don't** present concept statistics or mock events as real account data.",
+      "**Don't** turn the quiet operator panels into ornate temple artwork.",
+      "**Don't** exceed the established 40 visible visitors, 180 effect sprites or 32 MB decoded core-art budget."
+    ]
+  }
+}

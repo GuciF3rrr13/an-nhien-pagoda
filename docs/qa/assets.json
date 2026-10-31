@@ -1,0 +1,32 @@
+[
+  {
+    "file": "temple-hall.webp",
+    "width": 1080,
+    "height": 1920,
+    "hasAlpha": false,
+    "alphaRange": null,
+    "decodedBytes": 6220800
+  },
+  {
+    "file": "altar.webp",
+    "width": 880,
+    "height": 1100,
+    "hasAlpha": true,
+    "alphaRange": [
+      0,
+      255
+    ],
+    "decodedBytes": 3872000
+  },
+  {
+    "file": "visitors.png",
+    "width": 2048,
+    "height": 1024,
+    "hasAlpha": true,
+    "alphaRange": [
+      0,
+      255
+    ],
+    "decodedBytes": 8388608
+  }
+]

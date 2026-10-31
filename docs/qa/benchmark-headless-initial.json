@@ -1,0 +1,25 @@
+{
+  "durationMs": 60185,
+  "visitors": 40,
+  "effectLimit": 180,
+  "maxActiveEffects": 159,
+  "frames": 1145,
+  "meanFps": 20.16393780396694,
+  "p95FrameMs": 66.65999999999985,
+  "minimum60FrameWindowFps": 14.791076050782694,
+  "renderer": "WebGL",
+  "hardware": {
+    "cpu": "Apple M5",
+    "cores": 10,
+    "memoryGiB": 24,
+    "platform": "darwin",
+    "release": "27.0.0",
+    "arch": "arm64"
+  },
+  "browser": "Playwright Chromium headless",
+  "resolution": [
+    1080,
+    1920
+  ],
+  "build": "production"
+}

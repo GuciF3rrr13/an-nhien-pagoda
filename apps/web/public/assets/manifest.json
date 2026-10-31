@@ -1,0 +1,38 @@
+{
+  "generator": "OpenAI built-in image_gen",
+  "reference": "User-supplied temple concept; docs/reference/temple-concept.png",
+  "artDirection": "docs/ART_DIRECTION.md",
+  "prompts": "docs/ASSET_PROMPTS.md (repository root)",
+  "normalization": "node scripts/normalize-assets.mjs",
+  "assets": [
+    {
+      "file": "temple-hall.webp",
+      "role": "opaque architecture and prayer carpet background",
+      "size": [1080, 1920],
+      "pivot": [0.5, 0.5],
+      "source": "exec-06f56f4f-0621-421d-a172-970afbffc38b.png",
+      "prompt": "Original portrait Vietnamese temple hall, carved teak/gold, warm lanterns, empty shrine niche, unobstructed red carpet, no people/text/UI",
+      "status": "alpha/dimensions checked; native in-engine composition inspected"
+    },
+    {
+      "file": "altar.webp",
+      "role": "independent transparent altar, flowers and props",
+      "size": [880, 1100],
+      "pivot": [0.5, 1],
+      "source": "exec-f46e08e6-ca07-47d9-9ac3-0896bc42734a.png",
+      "prompt": "Frontal isolated golden seated Buddha shrine, lotus throne/flowers/incense/lamps, warm painted 2.5D matching hall, transparent, no text",
+      "status": "alpha checked; native in-engine composition inspected"
+    },
+    {
+      "file": "visitors.png",
+      "role": "two rear-view visitor identities × standing/kneeling/bowing/offering",
+      "size": [2048, 1024],
+      "frameSize": [512, 512],
+      "pivot": [0.5, 0.95703125],
+      "source": "exec-a72a6d46-6621-4a1a-a9de-45c5b8442aad.png",
+      "prompt": "Transparent 4-column 2-row atlas; same woman and man across standing/kneeling/bowing/lotus offering; rear view, offwhite robes, shared baseline, warm painted lighting",
+      "status": "alpha checked; normalized shared row scale and baseline; poses and native in-engine congregation inspected; browser action scenarios exercised"
+    }
+  ],
+  "provenance": "AI-generated for this project using supplied reference for visual direction. No third-party stock art. Original outputs retained as PNG alongside runtime exports. No claim of exclusive rights."
+}
