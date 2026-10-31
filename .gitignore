@@ -8,3 +8,6 @@ playwright-report/
 test-results-benchmark/
 playwright-report-benchmark/
 .DS_Store
+
+release/
+apps/server/src/embedded-assets.gen.ts

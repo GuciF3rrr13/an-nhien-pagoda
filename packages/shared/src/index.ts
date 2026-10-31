@@ -62,6 +62,20 @@ export const defaultSettings: Settings = {
   narratorEnabled: true,
   narratorVolume: 0.85,
 };
+export const tiktokUsernameSchema = z
+  .string()
+  .trim()
+  .transform((v) => v.replace(/^@/, ""))
+  .pipe(z.string().regex(/^([\w.]{1,64})?$/));
+// signApiKey: omitted keeps the stored key, "" or null clears it.
+export const tiktokConfigInputSchema = z.object({
+  username: tiktokUsernameSchema,
+  signApiKey: z.string().trim().max(200).nullable().optional(),
+});
+export interface TikTokConfig {
+  username: string;
+  hasSignKey: boolean;
+}
 export const mappingSchema = z.object({
   giftId: z.string().min(1).max(100),
   name: z.string().min(1).max(60),

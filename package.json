@@ -17,7 +17,8 @@
     "test:e2e": "playwright test",
     "benchmark": "TEMPLE_BENCHMARK=1 playwright test tests/e2e/benchmark.spec.ts",
     "check": "tsc --noEmit",
-    "format": "prettier --write 'apps/**/*.{ts,tsx,css,json,html}' 'packages/**/*.{ts,json}' 'tests/**/*.ts' 'scripts/*.mjs' playwright.config.ts"
+    "format": "prettier --write 'apps/**/*.{ts,tsx,css,json,html}' 'packages/**/*.{ts,json}' 'tests/**/*.ts' 'scripts/*.mjs' playwright.config.ts",
+    "package": "bun scripts/build-desktop.ts"
   },
   "dependencies": {
     "@fontsource/be-vietnam-pro": "^5.2.8",

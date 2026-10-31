@@ -5,13 +5,13 @@ Read `docs/STATUS.md` first, then the active phase in `docs/IMPLEMENTATION_PLAN.
 The local release is complete. Use README for startup/OBS/backup, `docs/SKILLS.md` for skill provenance, and `docs/qa/` for verification evidence. DESIGN.md and `.impeccable/design.json` capture the implemented visual system. Reuse an existing local server; do not reopen completed phases unless the user requests changes or a concrete regression is found.
 
 ## Fixed contract
-- Local-first cooperative Vietnamese temple game; Phaser 4.2.1, React, TypeScript, Node.js 24, SQLite; npm workspace.
+- Local-first cooperative Vietnamese temple game; Phaser 4.2.1, React, TypeScript, Node.js 24, SQLite; npm workspace. Desktop executables (macOS arm64/x64, Windows x64) are built with Bun ≥1.4.4 (`npm run package`) and by `.github/workflows/build.yml`; dev and tests stay on Node.
 - `/game`, `/overlay`, `/admin`; 1080×1920 portrait game; 40 visible visitors; wide and altar camera presets.
 - Preserve the approved golden Vietnamese temple reference: ornate altar, warm lanterns, red prayer carpets, kneeling congregation, painted layered 2.5D art.
 - Backend owns progress and events. Mock and optional TikTok adapters share normalized events; REST controls and WebSocket state synchronization.
 - Free commands `!le`, `!nhang`, `!cau <prayer>`; flowers require TikTok gifts (`!sen` is gift guidance); default 10-second viewer cooldown; offering milestones 100, 250, 500, then every additional 500.
 - Public prayers require operator approval. Gift streak increments count once. SQLite stores settings, mappings, events, prayers, and progress.
-- Bind locally; credentials belong in ignored environment files. Never expose signing credentials to browsers or logs.
+- Bind locally. The TikTok username and signing key are entered in Admin Settings and stored in local SQLite (user-approved; `.env` stays a fallback). The key is write-only: never return it from an API or snapshot, expose it to browsers, or log it. Never commit credentials.
 - Authorized extension (phases 7–9): per-LIVE Bảng tri ân, Vietnamese narrator/thanks, simultaneous-viewer milestones and sharing. Use Terra/Luna subagents for bounded work and Sol for complex integration. Deferred: themed rooms, daily activities, OBS WebSocket automation, official partner integration, cloud deployment.
 
 ## Quality and context budget

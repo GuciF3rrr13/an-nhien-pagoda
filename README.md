@@ -65,6 +65,17 @@ make start
 
 Dừng máy chủ phát triển trước khi chạy production trên cùng cổng. Có thể đổi `PORT` và `TEMPLE_DB` trong `.env` (sao chép từ `.env.example`). Ứng dụng chỉ lắng nghe `127.0.0.1`, không được triển khai công khai như một dịch vụ có xác thực.
 
+## Ứng dụng máy tính (macOS, Windows)
+
+Tải bản dựng từ trang **Releases** của GitHub (macOS Apple Silicon/Intel `.tar.gz`, Windows `.zip`), giải nén và chạy tệp `ChuaAnNhien-…`. Một cửa sổ dòng lệnh mở ra, trình duyệt tự mở trang quản trị; đóng cửa sổ đó (hoặc Ctrl+C) để thoát. Không cần cài Node hay Bun.
+
+- Dữ liệu: macOS `~/Library/Application Support/ChuaAnNhien`, Windows `%APPDATA%\ChuaAnNhien` (đổi bằng biến môi trường `TEMPLE_HOME`; `TEMPLE_DB` và `PORT` vẫn dùng được). Sao lưu bằng cách sao chép thư mục này khi ứng dụng đã dừng.
+- Cổng mặc định 3000; nếu đã có bản đang chạy, ứng dụng chỉ mở lại trang quản trị. Tùy chọn: `--no-open`, `--port <số>`.
+- Bản dựng **chưa ký số**: macOS có thể chặn lần đầu (`xattr -d com.apple.quarantine ./ChuaAnNhien-darwin-*`); Windows SmartScreen có thể cảnh báo.
+- Giọng dẫn Linh chỉ có trên macOS; Windows chạy không có giọng dẫn (lời cảm ơn vẫn hiện trên hình).
+
+Tự dựng cục bộ cần [Bun](https://bun.sh) ≥ 1.4.4: `npm ci`, rồi `npm run package` (máy hiện tại) hoặc `npm run package -- --target bun-windows-x64` / `bun-darwin-arm64` / `bun-darwin-x64`. Kết quả ở `release/`; kiểm tra bằng `node scripts/smoke-desktop.mjs release/<tệp>`. Workflow `.github/workflows/build.yml` dựng và kiểm tra cả ba bản trên máy chủ GitHub, và tạo Release khi đẩy tag `v*`.
+
 ## Tương tác của người xem
 
 | Đầu vào | Hành động mặc định |
@@ -113,11 +124,13 @@ Lượt chia sẻ nhận lời cảm ơn; cùng người được đọc tối �
 
 ## Kết nối TikTok (tùy chọn)
 
-1. Chạy `make setup` để cài phụ thuộc và tạo `.env` nếu chưa có.
-2. Sửa `.env`, đặt `TIKTOK_USERNAME` là tên tài khoản đang LIVE. Nếu dịch vụ ký yêu cầu khóa, đặt `TIKTOK_SIGN_API_KEY` trong cùng tệp; không đưa khóa vào mã trình duyệt.
-3. Chạy `make` (hoặc khởi động lại máy chủ nếu đã chạy), mở [quản trị](http://127.0.0.1:3000/admin) và bấm **Cài đặt → Kết nối TikTok**.
+1. Mở [quản trị](http://127.0.0.1:3000/admin) → **Cài đặt → Kết nối TikTok**.
+2. Nhập **tên tài khoản TikTok đang LIVE** và bấm **Lưu thông tin**. Nếu dịch vụ ký yêu cầu khóa, nhập **Khóa dịch vụ ký** (tùy chọn). Khóa chỉ ghi, không bao giờ hiển thị lại, không gửi vào trình duyệt hay nhật ký; dùng **Xóa khóa** để gỡ.
+3. Bấm **Kết nối TikTok**. Nếu đã kết nối, bấm lần nữa để áp dụng tài khoản mới.
 4. Kiểm tra trạng thái kết nối. Mã quà thật xuất hiện trong **Nhịp chùa** sau sự kiện; dùng mã đó trong tab Quà tặng.
 5. Chọn **Dùng mô phỏng** để ngắt connector thật và quay lại thử cục bộ.
+
+Tên tài khoản và khóa được lưu trong SQLite trên máy này (không mã hóa, cùng mức tin cậy với tệp `.env`); không nằm trong Git. `TIKTOK_USERNAME` / `TIKTOK_SIGN_API_KEY` trong `.env` vẫn được dùng làm giá trị dự phòng khi Cài đặt chưa có giá trị.
 
 Adapter dùng thư viện bên thứ ba `tiktok-live-connector`, **không phải API TikTok chính thức**. Nhận comment, join, like, follow, gift, share và số người xem phòng; chuẩn hóa sự kiện, chống trùng và tính phần tăng của chuỗi quà. Thống kê SDK v3 dùng `total` cho người xem đồng thời, không dùng `totalUser` tích lũy. Không gửi tin nhắn vào TikTok, không yêu cầu mật khẩu/cookie đăng nhập, không tự phát livestream. Kết nối thử lại có giới hạn; phiên LIVE kết thúc thì dừng. Khởi động máy chủ trở về mô phỏng và giữ bảng phiên gần nhất; nối lại TikTok cùng nguồn không xóa bảng.
 

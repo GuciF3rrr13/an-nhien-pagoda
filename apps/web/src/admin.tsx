@@ -34,6 +34,7 @@ import {
   type Action,
   type AdminSnapshot,
   type GiftMapping,
+  type TikTokConfig,
   type LiveEvent,
   type Settings,
 } from "../../../packages/shared/src/index.ts";
@@ -117,6 +118,12 @@ export function Admin() {
     [mappings, setMappings] = useState<GiftMapping[]>([]),
     [fps, setFps] = useState(0);
   const draftDirty = useRef(false);
+  const [tiktok, setTiktok] = useState<TikTokConfig>({
+      username: "",
+      hasSignKey: false,
+    }),
+    [tiktokUser, setTiktokUser] = useState(""),
+    [tiktokKey, setTiktokKey] = useState("");
   const obsUrl = `${location.origin}/overlay`;
   useEffect(() => {
     const timer = setInterval(
@@ -147,6 +154,36 @@ export function Admin() {
       active = false;
     };
   }, []);
+  useEffect(() => {
+    let active = true;
+    void api<TikTokConfig>("tiktok", undefined, "GET")
+      .then((config) => {
+        if (!active) return;
+        setTiktok(config);
+        setTiktokUser(config.username);
+      })
+      .catch(() => undefined);
+    return () => {
+      active = false;
+    };
+  }, []);
+  async function saveTikTok(clearKey = false) {
+    const config = await api<TikTokConfig>(
+      "tiktok",
+      {
+        username: tiktokUser,
+        ...(clearKey
+          ? { signApiKey: null }
+          : tiktokKey
+            ? { signApiKey: tiktokKey }
+            : {}),
+      },
+      "PUT",
+    );
+    setTiktok(config);
+    setTiktokUser(config.username);
+    setTiktokKey("");
+  }
   useEffect(() => {
     if (state && !draftDirty.current) setDraft(state.settings);
   }, [JSON.stringify(state?.settings)]);
@@ -1156,16 +1193,79 @@ export function Admin() {
                 {state?.connector.detail ?? "Đang tải trạng thái…"}
               </p>
               <p className="field-hint">
-                Connector bên thứ ba, không chính thức. Cấu hình TIKTOK_USERNAME
-                và khóa ký trong .env, rồi khởi động lại máy chủ. Không nhập mật
-                khẩu TikTok vào ứng dụng.
+                Connector bên thứ ba, không chính thức. Không nhập mật khẩu
+                TikTok vào ứng dụng.
               </p>
+              <form
+                className="settings-form"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  void run(() => saveTikTok(), "Đã lưu thông tin TikTok.");
+                }}
+              >
+                <label>
+                  Tên tài khoản TikTok đang LIVE
+                  <input
+                    value={tiktokUser}
+                    placeholder="@ten_tai_khoan"
+                    maxLength={65}
+                    autoComplete="off"
+                    spellCheck={false}
+                    onChange={(e) => setTiktokUser(e.target.value)}
+                  />
+                </label>
+                <label>
+                  Khóa dịch vụ ký (tùy chọn)
+                  <input
+                    type="password"
+                    value={tiktokKey}
+                    maxLength={200}
+                    autoComplete="off"
+                    placeholder={
+                      tiktok.hasSignKey
+                        ? "Đã lưu — để trống để giữ nguyên"
+                        : "Chỉ nhập nếu dịch vụ ký yêu cầu"
+                    }
+                    onChange={(e) => setTiktokKey(e.target.value)}
+                  />
+                </label>
+                <p className="field-hint">
+                  Khóa được lưu trên máy này và không bao giờ hiển thị lại.
+                  {state?.connector.mode === "tiktok"
+                    ? " Bấm Kết nối TikTok lần nữa để áp dụng thay đổi."
+                    : ""}
+                </p>
+                <div className="inline-actions">
+                  <button
+                    type="submit"
+                    className="button secondary"
+                    disabled={busy}
+                  >
+                    <Check size={16} />
+                    Lưu thông tin
+                  </button>
+                  {tiktok.hasSignKey && (
+                    <button
+                      type="button"
+                      className="button secondary"
+                      disabled={busy}
+                      onClick={() =>
+                        void run(() => saveTikTok(true), "Đã xóa khóa.")
+                      }
+                    >
+                      <Trash2 size={16} />
+                      Xóa khóa
+                    </button>
+                  )}
+                </div>
+              </form>
               <div className="inline-actions">
                 <button
                   className="button primary"
                   disabled={
                     !connected ||
                     busy ||
+                    !tiktok.username ||
                     state?.connector.state === "connecting"
                   }
                   onClick={() => {

@@ -6,6 +6,8 @@ import {
   liveEventSchema,
   mappingSchema,
   settingsSchema,
+  tiktokConfigInputSchema,
+  type TikTokConfig,
 } from "../../../packages/shared/src/index.ts";
 import { Store } from "./store.ts";
 import { Engine } from "./engine.ts";
@@ -129,6 +131,25 @@ export function createTempleApp(
     engine.updateSettings(settingsSchema.parse(req.body));
     res.json(engine.snapshot(true));
   });
+  // The sign key is write-only: it never appears in any response or snapshot.
+  const tiktokUsername = () =>
+    (
+      store.getConfig("tiktok.username") ??
+      process.env.TIKTOK_USERNAME ??
+      ""
+    ).replace(/^@/, "");
+  const tiktokConfig = (): TikTokConfig => ({
+    username: tiktokUsername(),
+    hasSignKey: !!store.getConfig("tiktok.signApiKey"),
+  });
+  app.get("/api/tiktok", (_req, res) => res.json(tiktokConfig()));
+  app.put("/api/tiktok", (req, res) => {
+    const input = tiktokConfigInputSchema.parse(req.body);
+    store.setConfig("tiktok.username", input.username);
+    if (input.signApiKey !== undefined)
+      store.setConfig("tiktok.signApiKey", input.signApiKey);
+    res.json(tiktokConfig());
+  });
   app.put("/api/mappings", (req, res) => {
     const mappings = z.array(mappingSchema).max(100).parse(req.body);
     if (new Set(mappings.map((m) => m.giftId)).size !== mappings.length) {
@@ -170,10 +191,15 @@ export function createTempleApp(
         res.status(409).json({ error: "Đang chuyển kết nối. Vui lòng chờ." });
         return;
       }
-      const username = (process.env.TIKTOK_USERNAME ?? "").replace(/^@/, "");
+      // Settings win; .env stays a fallback for existing setups.
+      const username = tiktokUsername();
+      const signApiKey =
+        store.getConfig("tiktok.signApiKey") ||
+        process.env.TIKTOK_SIGN_API_KEY ||
+        undefined;
       if (mode === "tiktok" && !/^[\w.]{1,64}$/.test(username)) {
         res.status(400).json({
-          error: "Đặt TIKTOK_USERNAME trong .env rồi khởi động lại máy chủ.",
+          error: "Nhập tên tài khoản TikTok trong Cài đặt trước khi kết nối.",
         });
         return;
       }
@@ -191,7 +217,7 @@ export function createTempleApp(
         } else {
           connector = new TikTokConnector(
             username,
-            process.env.TIKTOK_SIGN_API_KEY,
+            signApiKey,
             (event) => {
               const parsed = liveEventSchema.safeParse(event);
               if (parsed.success) engine.ingest(parsed.data);

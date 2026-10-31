@@ -2,6 +2,14 @@
 
 **Phases 0–9 are complete for the local release and requested viewer-engagement extension.** Actual TikTok reception and OBS/broadcast verification remain external setup tasks.
 
+## Desktop packaging and in-app TikTok settings (latest)
+- **TikTok username + sign key now live in Admin → Cài đặt** (`GET/PUT /api/tiktok`, SQLite `config` table, additive, `user_version` unchanged). Key is write-only; neither it nor the username is in any snapshot. `.env` values remain a fallback. **Decision:** this deliberately supersedes the earlier "credentials in ignored env files" contract (user-approved); AGENTS.md updated.
+- **Bun desktop executable:** `npm run package` → `scripts/build-desktop.ts` embeds `dist/web` and compiles `apps/server/src/desktop.ts` (data dir per OS, embedded static + Range, reuse-if-running, auto-open browser). Bun 1.4.4 runs `node:sqlite`, express/ws and `tiktok-live-connector` unchanged, so no SQLite adapter was added; dev/tests remain on Node.
+- **CI:** `.github/workflows/build.yml` — test job, native-runner matrix (macOS arm64, macOS Intel, Windows x64) with `scripts/smoke-desktop.mjs`, tag `v*` → GitHub Release with checksums. Actions pinned by SHA; no secrets.
+- Checks run: `tsc` clean; `npm test` 23/23 (3 new credential tests); Settings UI saved/persisted in a real browser (isolated instance on a scratch DB); under Bun: server, WS snapshot, SDK import behave like Node; compiled **macOS arm64** binary passed the smoke test from an empty directory (assets, Range 206, WS, DB in data dir, persistence, second-instance reuse, busy-port fallback). `actionlint` clean. Windows and Intel binaries cross-compiled only.
+- **Unverified:** the GitHub workflow has not run yet (first push/`workflow_dispatch` is the test); Windows and macOS Intel executables have not been run; binaries are unsigned/unnotarized; no new Playwright test for the Settings form (covered by API tests plus manual browser check); real TikTok reception still unverified.
+- Next: push, run the workflow via `workflow_dispatch`, fix any runner-specific failure, then tag `v0.1.0`.
+
 ## Local startup convenience
 - Added a root Makefile for setup, development, production build/start, tests and help; README documents TikTok configuration and connection. Setup preserves an existing `.env`.
 - Verified Make target commands and setup creation/preservation using a stubbed npm in a temporary directory; `make test` passed 20 tests, `make build` passed with the existing Vite chunk-size advisory, and an isolated `make run` returned HTTP 200 for `/admin` and `/game`. The first test attempt hit a sandbox IPC restriction; rerunning outside the sandbox passed.
