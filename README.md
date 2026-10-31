@@ -2,7 +2,7 @@
 
 > *Một niệm an lành, ngàn hoa nở.*
 
-Trò chơi chùa tương tác chạy ngay trên máy của bạn, dành cho buổi LIVE TikTok: cảnh dọc 1080×1920, khách lễ Phật, dâng hoa, thắp nhang, lời nguyện có duyệt và cột mốc chung của cả cộng đồng. Mặc định chạy ở chế độ **mô phỏng**, không cần tài khoản TikTok để thử.
+Trò chơi tương tác chạy ngay trên máy của bạn, dành cho buổi LIVE TikTok: cảnh dọc 1080×1920, khách lễ Phật, dâng hoa, thắp nhang, lời nguyện có duyệt và cột mốc chung của cả cộng đồng. Mặc định chạy ở chế độ **mô phỏng**, không cần tài khoản TikTok để thử.
 
 **Công nghệ:** Phaser 4.2.1 · React · TypeScript · Node.js 24 · SQLite
 
