@@ -1,3 +1,4 @@
+[![Build desktop app](https://github.com/mashupsolution/an-nhien-pagoda/actions/workflows/build.yml/badge.svg)](https://github.com/mashupsolution/an-nhien-pagoda/actions/workflows/build.yml)
 chua# Chùa An Nhiên LIVE
 
 > *Một niệm an lành, ngàn hoa nở.*
