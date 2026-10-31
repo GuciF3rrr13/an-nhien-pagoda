@@ -1,8 +1,8 @@
-# Chùa An Nhiên LIVE
+chua# Chùa An Nhiên LIVE
 
 > *Một niệm an lành, ngàn hoa nở.*
 
-Trò chơi chùa tương tác chạy ngay trên máy của bạn, dành cho buổi LIVE TikTok: cảnh dọc 1080×1920, khách lễ Phật, dâng hoa, thắp nhang, lời nguyện có duyệt và cột mốc chung của cả cộng đồng. Mặc định chạy ở chế độ **mô phỏng**, không cần tài khoản TikTok để thử.
+Trò chơi tương tác chạy ngay trên máy của bạn, dành cho buổi LIVE TikTok: cảnh dọc 1080×1920, khách lễ Phật, dâng hoa, thắp nhang, lời nguyện có duyệt và cột mốc chung của cả cộng đồng. Mặc định chạy ở chế độ **mô phỏng**, không cần tài khoản TikTok để thử.
 
 **Công nghệ:** Phaser 4.2.1 · React · TypeScript · Node.js 24 · SQLite
 
@@ -11,8 +11,8 @@ Trò chơi chùa tương tác chạy ngay trên máy của bạn, dành cho bu�
 <table>
   <tr>
     <td align="center" valign="top" width="34%">
-      <img src="screenshots/game.png" alt="Sân chùa: tượng Phật vàng, hoa sen rơi, khách quỳ lễ trên thảm đỏ, bảng tri ân" width="300"><br>
-      <sub><b>Sân chùa</b> (<code>/game</code>, <code>/overlay</code>)<br>Cảnh dọc 9:16 dùng cho OBS. Ảnh chụp lúc đạt mốc 1.000 người xem (mô phỏng).</sub>
+      <img src="screenshots/game.png" alt="Đạo tràng: tượng Phật vàng, hoa sen rơi, khách quỳ lễ trên thảm đỏ, bảng tri ân" width="300"><br>
+      <sub><b>Đạo tràng</b> (<code>/game</code>, <code>/overlay</code>)<br>Cảnh dọc 9:16 dùng cho OBS. Ảnh chụp lúc đạt mốc 1.000 người xem (mô phỏng).</sub>
     </td>
     <td align="center" valign="top" width="66%">
       <img src="screenshots/admin-dashboard.png" alt="Phòng điều khiển: xem trước cảnh, tương tác thử, thống kê và Bảng tri ân" width="520"><br>
@@ -52,7 +52,7 @@ Mở [Phòng điều khiển](http://127.0.0.1:3000/admin) và bấm **Chạy m�
 | Đường dẫn | Dùng để |
 | --- | --- |
 | [`/admin`](http://127.0.0.1:3000/admin) | Phòng điều khiển cho người vận hành |
-| [`/game`](http://127.0.0.1:3000/game) | Sân chùa: hướng dẫn bình luận/quà TikTok, bảng tri ân, nút bật/tắt tiếng. Tương tác thử nằm trong quản trị |
+| [`/game`](http://127.0.0.1:3000/game) | Đạo tràng: hướng dẫn bình luận/quà TikTok, bảng tri ân, nút bật/tắt tiếng. Tương tác thử nằm trong quản trị |
 | [`/overlay`](http://127.0.0.1:3000/overlay) | Nguồn OBS: chỉ cảnh chùa, không có điều khiển |
 | [`/overlay?audio=1`](http://127.0.0.1:3000/overlay?audio=1) | Nguồn OBS có âm thanh |
 
@@ -97,7 +97,7 @@ Mốc 100/250/500 làm sáng thêm ánh đèn; các mốc 500 tiếp theo kích 
 - **Lời cầu nguyện**: Duyệt hoặc Ẩn từng lời nguyện.
 - **Quà tặng**: ánh xạ mã quà thật sang hiệu ứng và điểm.
 - **Cài đặt**: âm lượng, thời gian chờ, tự chuyển góc nhìn, giọng đọc, đường dẫn OBS và kết nối TikTok.
-- Bản xem trước trong quản trị luôn tắt tiếng. Nhạc nền phát lặp lại với thanh âm lượng nền, tiếng chuông có thanh riêng. Trên trình duyệt thường cần bấm **Bật âm thanh** ở sân chùa.
+- Bản xem trước trong quản trị luôn tắt tiếng. Nhạc nền phát lặp lại với thanh âm lượng nền, tiếng chuông có thanh riêng. Trên trình duyệt thường cần bấm **Bật âm thanh** ở Đạo tràng.
 - **Phát lại** tạo sự kiện thử mới từ 20 sự kiện gần nhất. Hành động hợp lệ có thể cộng điểm thêm; đây không phải chức năng khôi phục dữ liệu. Nguồn `replay` được ghi riêng trong lịch sử.
 
 ### Bảng tri ân theo phiên LIVE
