@@ -68,7 +68,15 @@ Dừng máy chủ phát triển trước khi chạy production trên cùng cổn
 
 ## Ứng dụng máy tính (macOS, Windows)
 
-Tải bản dựng từ trang **Releases** của GitHub (macOS Apple Silicon/Intel `.tar.gz`, Windows `.zip`), giải nén và chạy tệp `ChuaAnNhien-…`. Một cửa sổ dòng lệnh mở ra, trình duyệt tự mở trang quản trị; đóng cửa sổ đó (hoặc Ctrl+C) để thoát. Không cần cài Node hay Bun.
+### Cách tải
+
+1. **Bản phát hành (khuyến nghị):** mở trang [Releases](https://github.com/mashupsolution/an-nhien-pagoda/releases) và tải tệp phù hợp: `…-macos-arm64.tar.gz` (Mac chip Apple M), `…-macos-x64.tar.gz` (Mac Intel) hoặc `…-windows-x64.zip` (Windows). Kèm `SHA256SUMS` để kiểm tra tệp. Release chỉ được tạo khi đẩy tag bắt đầu bằng `v`, ví dụ `git tag v0.1.0 && git push origin v0.1.0`; tag không có chữ `v` (như `0.1`) sẽ không tạo bản tải.
+2. **Bản dựng thử từ mỗi lần đẩy code:** mở tab [Actions](https://github.com/mashupsolution/an-nhien-pagoda/actions/workflows/build.yml), chọn lần chạy thành công mới nhất, kéo xuống mục **Artifacts** và tải tệp theo hệ điều hành (cần đăng nhập GitHub; lưu 14 ngày).
+3. **Tự dựng:** xem hướng dẫn ở cuối mục này.
+
+### Cách chạy
+
+Giải nén rồi chạy tệp `ChuaAnNhien-…`. Một cửa sổ dòng lệnh mở ra, trình duyệt tự mở trang quản trị; đóng cửa sổ đó (hoặc Ctrl+C) để thoát. Không cần cài Node hay Bun.
 
 - Dữ liệu: macOS `~/Library/Application Support/ChuaAnNhien`, Windows `%APPDATA%\ChuaAnNhien` (đổi bằng biến môi trường `TEMPLE_HOME`; `TEMPLE_DB` và `PORT` vẫn dùng được). Sao lưu bằng cách sao chép thư mục này khi ứng dụng đã dừng.
 - Cổng mặc định 3000; nếu đã có bản đang chạy, ứng dụng chỉ mở lại trang quản trị. Tùy chọn: `--no-open`, `--port <số>`.
