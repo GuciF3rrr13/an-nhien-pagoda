@@ -126,4 +126,10 @@ jobs:
 
           Kiểm tra tệp tải về bằng `SHA256SUMS`. Giọng dẫn Linh chỉ có trên macOS.
           NOTES
-          gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --title "$TAG" --notes-file notes.md ChuaAnNhien-* SHA256SUMS
+          # A release may already exist (e.g. created in the GitHub UI): attach to it instead of failing.
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$TAG" --repo "$GITHUB_REPOSITORY" --clobber ChuaAnNhien-* SHA256SUMS
+            gh release edit "$TAG" --repo "$GITHUB_REPOSITORY" --notes-file notes.md
+          else
+            gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --title "$TAG" --notes-file notes.md ChuaAnNhien-* SHA256SUMS
+          fi
