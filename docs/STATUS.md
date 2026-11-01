@@ -3,6 +3,7 @@
 **Phases 0–9 are complete for the local release and requested viewer-engagement extension.** Actual TikTok reception and OBS/broadcast verification remain external setup tasks.
 
 ## Documentation update
+- Moved the existing responsibility disclaimer near the top of README for visibility; its wording is unchanged.
 - Clarified the educational purpose of the project and instructional video, its independent simulation status, and the author's stated absence of fundraising or financial benefit; video gift interactions are simulated.
 - Clarified in both disclaimer languages that the source code is shared solely for learning and programming reference, and that each individual or organization is responsible for its use and related activities.
 - Added Vietnamese and English responsibility disclaimers to README, including the unofficial TikTok connector and unverified real LIVE reception and broadcasting. No project license was asserted.
