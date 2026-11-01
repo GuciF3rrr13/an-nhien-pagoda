@@ -191,7 +191,9 @@ Chưa bao gồm nhiều phòng chùa, mini game hằng ngày, tự điều khi�
 
 ## Miễn trừ trách nhiệm
 
-Phần mềm được cung cấp **“nguyên trạng” (AS IS)**, không kèm bảo đảm rõ ràng hay ngụ ý về khả năng hoạt động, tính phù hợp hoặc độ tin cậy. Người vận hành chịu trách nhiệm về việc sử dụng phần mềm, bao gồm:
+Mã nguồn này được chia sẻ chỉ nhằm mục đích học tập và tham khảo lập trình. Phần mềm được cung cấp **“nguyên trạng” (AS IS)**, không kèm bảo đảm rõ ràng hay ngụ ý về khả năng hoạt động, tính phù hợp hoặc độ tin cậy.
+
+Mỗi cá nhân hoặc tổ chức tự chịu trách nhiệm đối với việc tải về, sử dụng, chỉnh sửa, phân phối và mọi hoạt động phát sinh từ việc sử dụng mã nguồn, bao gồm:
 
 - Nội dung phát sóng, hình ảnh, âm thanh, bình luận và lời nguyện được duyệt hiển thị công khai.
 - Việc nhận quà tặng hoặc các khoản thu liên quan đến hoạt động phát sóng, cũng như quyền sử dụng hình ảnh, âm thanh và tài nguyên khác.
@@ -201,4 +203,4 @@ Phần mềm được cung cấp **“nguyên trạng” (AS IS)**, không kèm 
 
 Tác giả không đại diện, bảo trợ hoặc kiểm soát các kênh, tài khoản hay hoạt động sử dụng phần mềm. Trong phạm vi pháp luật cho phép, tác giả không chịu trách nhiệm đối với thiệt hại hoặc tranh chấp phát sinh từ việc sử dụng phần mềm, bao gồm mất dữ liệu, gián đoạn phát sóng hoặc vấn đề với tài khoản. Khi sử dụng nội dung liên quan đến Phật giáo, xin giữ sự tôn kính và tránh lừa đảo, trục lợi hoặc xúc phạm niềm tin của người khác.
 
-> **Disclaimer (EN):** This software is provided “AS IS”, without warranties. Operators are responsible for their streams, approved prayers, gifts or revenue, rights to the content they use, and compliance with applicable laws and platform terms. The TikTok connector is community-maintained and unofficial; real LIVE reception and broadcasting have not been verified. The author does not represent, endorse or control channels using the software and, to the extent permitted by law, accepts no liability for resulting losses or disputes.
+> **Disclaimer (EN):** This source code is shared solely for educational and programming reference purposes. The software is provided “AS IS”, without warranties. Each individual or organization is responsible for downloading, using, modifying and distributing the code, and for activities arising from its use, including streams, approved prayers, gifts or revenue, rights to the content used, and compliance with applicable laws and platform terms. The TikTok connector is community-maintained and unofficial; real LIVE reception and broadcasting have not been verified. The author does not represent, endorse or control channels using the software and, to the extent permitted by law, accepts no liability for resulting losses or disputes.

@@ -3,6 +3,7 @@
 **Phases 0–9 are complete for the local release and requested viewer-engagement extension.** Actual TikTok reception and OBS/broadcast verification remain external setup tasks.
 
 ## Documentation update
+- Clarified in both disclaimer languages that the source code is shared solely for learning and programming reference, and that each individual or organization is responsible for its use and related activities.
 - Added Vietnamese and English responsibility disclaimers to README, including the unofficial TikTok connector and unverified real LIVE reception and broadcasting. No project license was asserted.
 - Checks: reviewed the wording against the existing README and this status; checked the Markdown diff. Application tests were not run for this documentation-only change.
 - Next: validate real TikTok reception and OBS capture/audio when a suitable LIVE session is available; desktop release workflow validation remains pending as described below.
