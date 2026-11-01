@@ -2,6 +2,11 @@
 
 **Phases 0–9 are complete for the local release and requested viewer-engagement extension.** Actual TikTok reception and OBS/broadcast verification remain external setup tasks.
 
+## Documentation update
+- Added Vietnamese and English responsibility disclaimers to README, including the unofficial TikTok connector and unverified real LIVE reception and broadcasting. No project license was asserted.
+- Checks: reviewed the wording against the existing README and this status; checked the Markdown diff. Application tests were not run for this documentation-only change.
+- Next: validate real TikTok reception and OBS capture/audio when a suitable LIVE session is available; desktop release workflow validation remains pending as described below.
+
 ## Desktop packaging and in-app TikTok settings (latest)
 - **TikTok username + sign key now live in Admin → Cài đặt** (`GET/PUT /api/tiktok`, SQLite `config` table, additive, `user_version` unchanged). Key is write-only; neither it nor the username is in any snapshot. `.env` values remain a fallback. **Decision:** this deliberately supersedes the earlier "credentials in ignored env files" contract (user-approved); AGENTS.md updated.
 - **Bun desktop executable:** `npm run package` → `scripts/build-desktop.ts` embeds `dist/web` and compiles `apps/server/src/desktop.ts` (data dir per OS, embedded static + Range, reuse-if-running, auto-open browser). Bun 1.4.4 runs `node:sqlite`, express/ws and `tiktok-live-connector` unchanged, so no SQLite adapter was added; dev/tests remain on Node.
