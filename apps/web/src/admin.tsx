@@ -269,16 +269,18 @@ export function Admin() {
               `demo:visitor:${n % 24}`,
             ),
           );
-        else
+        else {
+          const commands = ["!le", "!nhang", "!le", "!nhang", "!que"];
           await api(
             "events",
             makeEvent(
               "comment",
               user,
-              { text: ["!le", "!nhang"][n % 2] },
+              { text: commands[n % commands.length] },
               `demo:visitor:${n % 24}`,
             ),
           );
+        }
         if (active) timer = setTimeout(tick, 1800);
       } catch (e) {
         if (active) {
@@ -1134,6 +1136,215 @@ export function Admin() {
                   Lưu cài đặt
                 </button>
               </form>
+            </section>
+            <section className="content-sheet">
+              <h2>Hiệu ứng tương tác</h2>
+              <form
+                className="settings-form"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  void run(async () => {
+                    await api("settings", draft, "PUT");
+                    draftDirty.current = false;
+                  }, "Đã lưu cài đặt hiệu ứng.");
+                }}
+              >
+                <label className="check-label">
+                  <input
+                    type="checkbox"
+                    checked={draft.allEffectsEnabled ?? true}
+                    onChange={(e) =>
+                      setSetting("allEffectsEnabled", e.target.checked)
+                    }
+                  />
+                  <strong>Bật tất cả hiệu ứng mới</strong> (tắt = chỉ giữ chức năng cơ bản)
+                </label>
+                <label className="check-label">
+                  <input
+                    type="checkbox"
+                    checked={draft.shoutoutsEnabled ?? true}
+                    onChange={(e) =>
+                      setSetting("shoutoutsEnabled", e.target.checked)
+                    }
+                  />
+                  Lời chúc ngắn khi lễ/nhang/quà (shout-out)
+                </label>
+                <label className="check-label">
+                  <input
+                    type="checkbox"
+                    checked={draft.fortuneEnabled ?? true}
+                    onChange={(e) =>
+                      setSetting("fortuneEnabled", e.target.checked)
+                    }
+                  />
+                  Rút lá thăm (!que) với cooldown
+                </label>
+                <label>
+                  Thời gian chờ rút thăm (giờ)
+                  <input
+                    type="number"
+                    min="1"
+                    max="168"
+                    value={draft.fortuneCooldownHours ?? 24}
+                    onChange={(e) =>
+                      setSetting("fortuneCooldownHours", e.target.valueAsNumber)
+                    }
+                  />
+                </label>
+                <label className="check-label">
+                  <input
+                    type="checkbox"
+                    checked={draft.streaksEnabled ?? true}
+                    onChange={(e) =>
+                      setSetting("streaksEnabled", e.target.checked)
+                    }
+                  />
+                  Theo dõi chuỗi ngày liên tiếp của người xem
+                </label>
+                <label className="check-label">
+                  <input
+                    type="checkbox"
+                    checked={draft.bigGiftEffectEnabled ?? true}
+                    onChange={(e) =>
+                      setSetting("bigGiftEffectEnabled", e.target.checked)
+                    }
+                  />
+                  Hiệu ứng đặc biệt cho quà lớn
+                </label>
+                <label>
+                  Ngưỡng quà lớn (điểm)
+                  <input
+                    type="number"
+                    min="5"
+                    max="1000"
+                    value={draft.bigGiftThreshold ?? 50}
+                    onChange={(e) =>
+                      setSetting("bigGiftThreshold", e.target.valueAsNumber)
+                    }
+                  />
+                </label>
+                <label className="check-label">
+                  <input
+                    type="checkbox"
+                    checked={draft.sceneByTimeEnabled ?? true}
+                    onChange={(e) =>
+                      setSetting("sceneByTimeEnabled", e.target.checked)
+                    }
+                  />
+                  Đổi cảnh theo giờ Việt Nam (sương sớm, hoàng hôn, đêm, rằm/mùng một)
+                </label>
+                <label className="check-label">
+                  <input
+                    type="checkbox"
+                    checked={draft.browserTTSEnabled ?? true}
+                    onChange={(e) =>
+                      setSetting("browserTTSEnabled", e.target.checked)
+                    }
+                  />
+                  Dự phòng giọng đọc trình duyệt (Linux/Windows)
+                </label>
+                <button
+                  className="button primary"
+                  type="submit"
+                  disabled={!connected || busy}
+                >
+                  Lưu cài đặt hiệu ứng
+                </button>
+              </form>
+            </section>
+            <section className="content-sheet">
+              <h2>Mục tiêu cộng đồng</h2>
+              <p className="description">
+                Mục tiêu chung cho cả phòng trong thời gian giới hạn. Hoàn thành sẽ kích hoạt lễ hoa sen.
+              </p>
+              <form
+                className="settings-form"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  void run(async () => {
+                    await api("settings", draft, "PUT");
+                    draftDirty.current = false;
+                  }, "Đã lưu cài đặt mục tiêu.");
+                }}
+              >
+                <label className="check-label">
+                  <input
+                    type="checkbox"
+                    checked={draft.communityGoalEnabled ?? false}
+                    onChange={(e) =>
+                      setSetting("communityGoalEnabled", e.target.checked)
+                    }
+                  />
+                  Bật tính năng mục tiêu cộng đồng
+                </label>
+                <label>
+                  Mục tiêu (điểm)
+                  <input
+                    type="number"
+                    min="10"
+                    max="10000"
+                    value={draft.communityGoalTarget ?? 100}
+                    onChange={(e) =>
+                      setSetting("communityGoalTarget", e.target.valueAsNumber)
+                    }
+                  />
+                </label>
+                <label>
+                  Thời gian (phút)
+                  <input
+                    type="number"
+                    min="1"
+                    max="180"
+                    value={draft.communityGoalMinutes ?? 30}
+                    onChange={(e) =>
+                      setSetting("communityGoalMinutes", e.target.valueAsNumber)
+                    }
+                  />
+                </label>
+                <button
+                  className="button primary"
+                  type="submit"
+                  disabled={!connected || busy}
+                >
+                  Lưu cài đặt
+                </button>
+              </form>
+              <div className="inline-actions">
+                <button
+                  className="button secondary"
+                  disabled={
+                    !connected ||
+                    busy ||
+                    !draft.communityGoalEnabled ||
+                    !!(state?.communityGoal && !state.communityGoal.completed)
+                  }
+                  onClick={() =>
+                    void run(
+                      () => api("goal/start"),
+                      "Đã bắt đầu mục tiêu mới.",
+                    )
+                  }
+                >
+                  <Play size={16} />
+                  Bắt đầu mục tiêu
+                </button>
+                <button
+                  className="button secondary"
+                  disabled={!connected || busy || !state?.communityGoal}
+                  onClick={() =>
+                    void run(() => api("goal/stop"), "Đã dừng mục tiêu.")
+                  }
+                >
+                  <Pause size={16} />
+                  Dừng mục tiêu
+                </button>
+              </div>
+              {state?.communityGoal && (
+                <p className="field-hint">
+                  Đang chạy: {state.communityGoal.progress}/{state.communityGoal.target}
+                  {state.communityGoal.completed ? " · Hoàn thành!" : ""}
+                </p>
+              )}
             </section>
             <section className="content-sheet">
               <h2>

@@ -1,5 +1,11 @@
 import Phaser from "phaser";
-import type { Ceremony, Visitor } from "../../../packages/shared/src/index.ts";
+import type {
+  Ceremony,
+  FortuneSlip,
+  Shoutout,
+  Snapshot,
+  Visitor,
+} from "../../../packages/shared/src/index.ts";
 import type { TempleClient } from "./api";
 export interface GameStats {
   ready: boolean;
@@ -68,6 +74,20 @@ export function mountGame(parent: HTMLElement, client: TempleClient) {
     private audienceEndsAt = 0;
     private audienceLift = 0;
     private reducedMotion = false;
+    // New engagement visuals
+    private shoutoutTexts: Phaser.GameObjects.Text[] = [];
+    private fortuneTexts: Phaser.GameObjects.Text[] = [];
+    private seenShoutouts = new Set<string>();
+    private seenFortunes = new Set<string>();
+    private goalBar?: Phaser.GameObjects.Graphics;
+    private goalText?: Phaser.GameObjects.Text;
+    private mistOverlay?: Phaser.GameObjects.Rectangle;
+    private duskOverlay?: Phaser.GameObjects.Rectangle;
+    private nightOverlay?: Phaser.GameObjects.Rectangle;
+    private lunarDecor?: Phaser.GameObjects.Text;
+    private currentPeriod: Snapshot["sceneTime"]["period"] = "day";
+    private bigGiftText?: Phaser.GameObjects.Text;
+    private bigGiftUntil = 0;
     constructor() {
       super("temple");
     }
@@ -143,6 +163,98 @@ export function mountGame(parent: HTMLElement, client: TempleClient) {
           kind: "spark",
           size: 1,
         });
+
+      // Scene time overlays
+      this.mistOverlay = this.add
+        .rectangle(540, 960, 1080, 1920, 0xd4e5f7, 0)
+        .setDepth(2800)
+        .setBlendMode(Phaser.BlendModes.MULTIPLY);
+      this.duskOverlay = this.add
+        .rectangle(540, 960, 1080, 1920, 0xffb347, 0)
+        .setDepth(2800)
+        .setBlendMode(Phaser.BlendModes.MULTIPLY);
+      this.nightOverlay = this.add
+        .rectangle(540, 960, 1080, 1920, 0x1a1a2e, 0)
+        .setDepth(2800)
+        .setBlendMode(Phaser.BlendModes.MULTIPLY);
+
+      // Lunar special decoration
+      this.lunarDecor = this.add
+        .text(540, 180, "", {
+          fontFamily: '"Be Vietnam Pro"',
+          fontSize: "42px",
+          color: "#ffd700",
+          stroke: "#8b0000",
+          strokeThickness: 3,
+        })
+        .setOrigin(0.5)
+        .setDepth(2900)
+        .setVisible(false);
+
+      // Community goal bar
+      this.goalBar = this.add.graphics().setDepth(3000);
+      this.goalText = this.add
+        .text(540, 60, "", {
+          fontFamily: '"Be Vietnam Pro"',
+          fontSize: "24px",
+          color: "#fff",
+          backgroundColor: "#3a1f0dcc",
+          padding: { left: 12, right: 12, top: 6, bottom: 6 },
+        })
+        .setOrigin(0.5)
+        .setDepth(3001)
+        .setVisible(false);
+
+      // Big gift text
+      this.bigGiftText = this.add
+        .text(540, 450, "", {
+          fontFamily: '"Be Vietnam Pro"',
+          fontSize: "56px",
+          color: "#ffd700",
+          stroke: "#8b0000",
+          strokeThickness: 4,
+          align: "center",
+        })
+        .setOrigin(0.5)
+        .setDepth(3100)
+        .setVisible(false);
+
+      // Shoutout text pool
+      for (let i = 0; i < 4; i++) {
+        this.shoutoutTexts.push(
+          this.add
+            .text(0, 0, "", {
+              fontFamily: '"Be Vietnam Pro"',
+              fontSize: "28px",
+              color: "#fff0d1",
+              backgroundColor: "#5a2d0acc",
+              padding: { left: 10, right: 10, top: 5, bottom: 5 },
+            })
+            .setOrigin(0.5)
+            .setDepth(2950)
+            .setVisible(false),
+        );
+      }
+
+      // Fortune slip text pool
+      for (let i = 0; i < 2; i++) {
+        this.fortuneTexts.push(
+          this.add
+            .text(0, 0, "", {
+              fontFamily: '"Be Vietnam Pro"',
+              fontSize: "32px",
+              color: "#8b0000",
+              backgroundColor: "#fff8dcee",
+              padding: { left: 16, right: 16, top: 10, bottom: 10 },
+              wordWrap: { width: 600 },
+              align: "center",
+            })
+            .setOrigin(0.5)
+            .setDepth(3050)
+            .setVisible(false),
+        );
+      }
+
       this.unsubscribe = client.subscribe(() => this.sync());
       this.events.once("shutdown", () => this.unsubscribe?.());
       this.ready = true;
@@ -189,6 +301,8 @@ export function mountGame(parent: HTMLElement, client: TempleClient) {
         this.hasSnapshot = true;
         this.sessionId = state.session.id;
         this.seen = new Set(state.ceremonies.map((c) => c.id));
+        this.seenShoutouts = new Set(state.shoutouts?.map((s) => s.id) ?? []);
+        this.seenFortunes = new Set(state.fortunes?.map((f) => f.id) ?? []);
       } else {
         for (const c of state.ceremonies)
           if (!this.seen.has(c.id)) {
@@ -197,11 +311,122 @@ export function mountGame(parent: HTMLElement, client: TempleClient) {
               if (c.action === "audience-milestone")
                 this.celebrateAudience(c.count, c.intensity);
               this.burst(c.action, c.intensity, c.count);
+              // Detect big gift effect by name pattern
+              if (c.action === "milestone" && c.name.includes("đại công đức")) {
+                this.showBigGift(c.name.replace(" đại công đức!", ""));
+              }
             }
           }
+        // Handle new shoutouts
+        if (state.settings.allEffectsEnabled && state.settings.shoutoutsEnabled) {
+          for (const s of state.shoutouts ?? [])
+            if (!this.seenShoutouts.has(s.id)) {
+              this.seenShoutouts.add(s.id);
+              if (!capture && Math.abs(state.serverTime - s.at) < 2500)
+                this.showShoutout(s);
+            }
+        }
+        // Handle new fortunes
+        if (state.settings.allEffectsEnabled && state.settings.fortuneEnabled) {
+          for (const f of state.fortunes ?? [])
+            if (!this.seenFortunes.has(f.id)) {
+              this.seenFortunes.add(f.id);
+              if (!capture && Math.abs(state.serverTime - f.at) < 2500)
+                this.showFortune(f);
+            }
+        }
       }
       if (this.seen.size > 256)
         this.seen = new Set(state.ceremonies.map((c) => c.id));
+      if (this.seenShoutouts.size > 64)
+        this.seenShoutouts = new Set(state.shoutouts?.map((s) => s.id) ?? []);
+      if (this.seenFortunes.size > 32)
+        this.seenFortunes = new Set(state.fortunes?.map((f) => f.id) ?? []);
+    }
+
+    private showShoutout(shoutout: Shoutout) {
+      const text = this.shoutoutTexts.find((t) => !t.visible);
+      if (!text) return;
+      text
+        .setText(`${shoutout.userName} · ${shoutout.blessing}`)
+        .setPosition(540, 1650 + Math.random() * 100)
+        .setAlpha(0)
+        .setVisible(true);
+      this.tweens.add({
+        targets: text,
+        alpha: 1,
+        y: text.y - 40,
+        duration: 400,
+        ease: "Sine.easeOut",
+        onComplete: () => {
+          this.tweens.add({
+            targets: text,
+            alpha: 0,
+            y: text.y - 30,
+            duration: 4000,
+            delay: 2500,
+            ease: "Sine.easeIn",
+            onComplete: () => text.setVisible(false),
+          });
+        },
+      });
+    }
+
+    private showFortune(fortune: FortuneSlip) {
+      const text = this.fortuneTexts.find((t) => !t.visible);
+      if (!text) return;
+      text
+        .setText(`🎋 ${fortune.userName}\n"${fortune.text}"`)
+        .setPosition(540, 800)
+        .setAlpha(0)
+        .setScale(0.8)
+        .setVisible(true);
+      this.tweens.add({
+        targets: text,
+        alpha: 1,
+        scale: 1,
+        duration: 500,
+        ease: "Back.easeOut",
+        onComplete: () => {
+          this.tweens.add({
+            targets: text,
+            alpha: 0,
+            scale: 0.9,
+            duration: 800,
+            delay: 6000,
+            ease: "Sine.easeIn",
+            onComplete: () => text.setVisible(false),
+          });
+        },
+      });
+    }
+
+    private showBigGift(name: string) {
+      if (!this.bigGiftText) return;
+      this.bigGiftText
+        .setText(`✨ ${name} ✨\nĐại Công Đức`)
+        .setAlpha(0)
+        .setScale(0.5)
+        .setVisible(true);
+      this.bigGiftUntil = Date.now() + 5000;
+      this.tweens.add({
+        targets: this.bigGiftText,
+        alpha: 1,
+        scale: 1,
+        duration: 600,
+        ease: "Back.easeOut",
+        onComplete: () => {
+          this.tweens.add({
+            targets: this.bigGiftText,
+            alpha: 0,
+            scale: 1.1,
+            duration: 1000,
+            delay: 3500,
+            ease: "Sine.easeIn",
+            onComplete: () => this.bigGiftText?.setVisible(false),
+          });
+        },
+      });
     }
     private burst(action: Ceremony["action"], intensity: number, count = 0) {
       const amount =
@@ -365,6 +590,97 @@ export function mountGame(parent: HTMLElement, client: TempleClient) {
                 now - v.actionAt < 5000,
             )
             .setDepth(2600);
+        }
+
+        // Scene time overlays
+        if (state.settings.allEffectsEnabled && state.settings.sceneByTimeEnabled) {
+          const period = state.sceneTime?.period ?? "day";
+          if (period !== this.currentPeriod) {
+            this.currentPeriod = period;
+            const targetMist = period === "dawn" ? 0.15 : 0;
+            const targetDusk = period === "dusk" ? 0.12 : 0;
+            const targetNight = period === "night" ? 0.25 : 0;
+            this.tweens.add({
+              targets: this.mistOverlay,
+              alpha: targetMist,
+              duration: 2000,
+            });
+            this.tweens.add({
+              targets: this.duskOverlay,
+              alpha: targetDusk,
+              duration: 2000,
+            });
+            this.tweens.add({
+              targets: this.nightOverlay,
+              alpha: targetNight,
+              duration: 2000,
+            });
+          }
+          // Lunar special decoration
+          if (state.sceneTime?.isLunarSpecial && this.lunarDecor) {
+            const lunarText =
+              state.sceneTime.lunarDay === 1
+                ? "🌑 Mùng Một 🌑"
+                : "🌕 Rằm 🌕";
+            if (!this.lunarDecor.visible || this.lunarDecor.text !== lunarText) {
+              this.lunarDecor.setText(lunarText).setVisible(true).setAlpha(0);
+              this.tweens.add({
+                targets: this.lunarDecor,
+                alpha: 1,
+                duration: 1000,
+              });
+            }
+          } else if (this.lunarDecor?.visible) {
+            this.tweens.add({
+              targets: this.lunarDecor,
+              alpha: 0,
+              duration: 500,
+              onComplete: () => this.lunarDecor?.setVisible(false),
+            });
+          }
+        } else {
+          this.mistOverlay?.setAlpha(0);
+          this.duskOverlay?.setAlpha(0);
+          this.nightOverlay?.setAlpha(0);
+          this.lunarDecor?.setVisible(false);
+        }
+
+        // Community goal bar
+        if (
+          state.settings.allEffectsEnabled &&
+          state.settings.communityGoalEnabled &&
+          state.communityGoal &&
+          this.goalBar &&
+          this.goalText
+        ) {
+          const goal = state.communityGoal;
+          const progress = Math.min(1, goal.progress / goal.target);
+          const remaining = Math.max(0, goal.endsAt - state.serverTime);
+          const minutes = Math.floor(remaining / 60000);
+          const seconds = Math.floor((remaining % 60000) / 1000);
+
+          this.goalBar.clear();
+          this.goalBar.fillStyle(0x3a1f0d, 0.8);
+          this.goalBar.fillRoundedRect(140, 90, 800, 24, 12);
+          this.goalBar.fillStyle(goal.completed ? 0xffd700 : 0xc45c26, 1);
+          this.goalBar.fillRoundedRect(
+            142,
+            92,
+            Math.max(0, 796 * progress),
+            20,
+            10,
+          );
+
+          this.goalText
+            .setText(
+              goal.completed
+                ? "🎉 Hoàn thành mục tiêu!"
+                : `${goal.progress}/${goal.target} · Còn ${minutes}:${seconds.toString().padStart(2, "0")}`,
+            )
+            .setVisible(true);
+        } else {
+          this.goalBar?.clear();
+          this.goalText?.setVisible(false);
         }
       }
       let active = 0;

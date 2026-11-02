@@ -107,8 +107,9 @@ Tự dựng cục bộ cần [Bun](https://bun.sh) ≥ 1.4.4: `npm ci`, rồi `n
 
 | Đầu vào | Hành động mặc định |
 | --- | --- |
-| `!le` | Lễ Phật, +1 điểm chung |
-| `!nhang` | Thắp nhang, +1 điểm chung |
+| `!le` | Lễ Phật, +1 điểm chung, hiện lời chúc |
+| `!nhang` | Thắp nhang, +1 điểm chung, hiện lời chúc |
+| `!que` | Rút lá thăm ngẫu nhiên (mỗi ngày một lần mặc định) |
 | `!sen` | Hướng dẫn dâng hoa bằng quà tặng LIVE; không cộng điểm |
 | `!cau <nội dung>` | Gửi lời nguyện chờ duyệt, +1 điểm chung |
 | Quà tặng | Theo quy tắc trong tab Quà tặng |
@@ -137,9 +138,21 @@ Trong quản trị, **Bắt đầu phiên mới → Xác nhận phiên mới** �
 
 ### Người dẫn chuyện tiếng Việt
 
-Máy macOS có giọng **Linh** dùng bộ tổng hợp cục bộ để tạo WAV; không cần tài khoản dịch vụ TTS. **Cài đặt** hiển thị giọng có khả dụng hay không, cho phép bật/tắt lời dẫn và chỉnh âm lượng riêng. Nếu thiếu giọng hoặc tổng hợp thất bại, lời cảm ơn vẫn hiện trên hình. Hệ điều hành khác macOS báo giọng không khả dụng.
+Máy macOS có giọng **Linh** dùng bộ tổng hợp cục bộ để tạo WAV; không cần tài khoản dịch vụ TTS. **Cài đặt** hiển thị giọng có khả dụng hay không, cho phép bật/tắt lời dẫn và chỉnh âm lượng riêng. Nếu thiếu giọng hoặc tổng hợp thất bại, lời cảm ơn vẫn hiện trên hình. Trên **Linux/Windows**, nếu giọng Linh không có, trình duyệt sẽ dùng Web Speech API làm giọng dự phòng (cần trình duyệt hỗ trợ).
 
 Một chuỗi quà hoàn tất được cảm ơn một lần, đọc tên đã làm sạch; follow được giới hạn tần suất. Lời nguyện chưa duyệt không được đọc. Các lời dẫn xếp hàng tuần tự, tối đa 12 mục và bỏ mục cũ quá 20 giây. Nhạc tự nhỏ khi đọc rồi trở lại mức đã đặt. Nguồn OBS dùng `?audio=1`; chỉ phát tiếng ở một cửa sổ/nguồn để tránh lặp. Tải lại hoặc bật âm thanh không phát lại các lời cảm ơn đã có sẵn.
+
+### Hiệu ứng tương tác mới
+
+Các tính năng sau có thể bật/tắt độc lập trong **Cài đặt → Hiệu ứng tương tác**:
+
+- **Lời chúc (shout-out)**: Khi lễ/nhang/quà, tên người xem hiện cùng một lời chúc ngẫu nhiên trên màn hình.
+- **Rút lá thăm (`!que`)**: Người xem rút câu thơ/lời chúc ngẫu nhiên, mỗi ngày một lần (có thể chỉnh cooldown). Danh sách lá thăm chỉnh được trong quản trị.
+- **Chuỗi ngày liên tiếp**: Theo dõi số ngày liên tiếp mỗi người xem tương tác; đạt 3/7/30/100 ngày có danh hiệu riêng (Thành tâm / Đạo hữu / Đồng tu / Thiện tri thức).
+- **Mục tiêu cộng đồng**: Đặt mục tiêu (ví dụ: 100 nhang trong 30 phút) cho cả phòng; hoàn thành kích hoạt lễ hoa sen.
+- **Hiệu ứng quà lớn**: Quà đạt ngưỡng điểm (mặc định 50) hiện tên người tặng lớn trên màn hình trong vài giây.
+- **Cảnh theo giờ**: Cảnh chùa đổi theo giờ Việt Nam: sương sớm (5-7h), hoàng hôn (17-19h), đêm tĩnh lặng (19-5h). Ngày rằm (15) và mùng một theo âm lịch có trang trí đặc biệt.
+- **Công tắc tổng**: "Bật tất cả hiệu ứng mới" tắt toàn bộ tính năng mới, chỉ giữ chức năng cơ bản.
 
 ### Cột mốc khán giả và chia sẻ
 

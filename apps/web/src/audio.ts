@@ -72,6 +72,7 @@ export class Soundscape {
     if (!this.narratorEnabled) this.narrator?.clear();
     if (this.narratorEnabled && this.active && !this.narrator)
       this.ensureNarrator(previousState ?? state);
+    this.narrator?.setBrowserTTSEnabled(state.settings.browserTTSEnabled ?? true);
     if (this.narratorEnabled && this.active && newAnnouncements.length)
       this.narrator?.update(
         state.session.id,

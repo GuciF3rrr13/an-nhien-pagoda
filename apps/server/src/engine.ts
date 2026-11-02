@@ -1,17 +1,26 @@
 import { randomUUID } from "node:crypto";
 import {
   defaultSettings,
+  defaultBlessings,
+  defaultFortuneSlips,
   actionLabels,
+  getScenePeriod,
+  getLunarDay,
+  getStreakTitle,
   type Action,
   type Announcement,
   type AdminSnapshot,
   type ConnectorStatus,
+  type CommunityGoal,
+  type FortuneSlip,
   type GiftMapping,
   type LiveEvent,
   type LeaderboardEntry,
   type Prayer,
   type Settings,
+  type Shoutout,
   type Snapshot,
+  type ViewerStreak,
   type Visitor,
 } from "../../../packages/shared/src/index.ts";
 import { Store } from "./store.ts";
@@ -54,6 +63,14 @@ interface DurableState {
       source: LiveEvent["source"];
     }
   >;
+  // New engagement features
+  shoutouts: Shoutout[];
+  fortunes: FortuneSlip[];
+  fortuneDraws: Record<string, number>; // visitorId -> last draw timestamp
+  viewerStreaks: Record<string, { streak: number; lastDate: string; name: string }>;
+  communityGoal: CommunityGoal | null;
+  fortuneList: string[];
+  blessingsList: string[];
 }
 const initial = (now: number): DurableState => ({
   version: 1,
@@ -107,6 +124,13 @@ const initial = (now: number): DurableState => ({
     participation: {},
   },
   prayerCredits: {},
+  shoutouts: [],
+  fortunes: [],
+  fortuneDraws: {},
+  viewerStreaks: {},
+  communityGoal: null,
+  fortuneList: [...defaultFortuneSlips],
+  blessingsList: [...defaultBlessings],
 });
 
 export class Engine {
@@ -146,6 +170,14 @@ export class Engine {
     this.state.shareThanks ??= {};
     this.state.lastSharePrompt ??= this.state.session.startedAt;
     this.state.lastAudienceCelebration ??= null;
+    // New engagement features defaults
+    this.state.shoutouts ??= [];
+    this.state.fortunes ??= [];
+    this.state.fortuneDraws ??= {};
+    this.state.viewerStreaks ??= {};
+    this.state.communityGoal ??= null;
+    this.state.fortuneList ??= [...defaultFortuneSlips];
+    this.state.blessingsList ??= [...defaultBlessings];
     if (this.state.version !== 1)
       throw new Error("Unsupported database version");
     store.save(this.state);
@@ -191,6 +223,16 @@ export class Engine {
         .map((p) => ({ ...p })),
       recent: admin ? s.recent.map((r) => ({ ...r })) : [],
       connector: { ...this.connector },
+      shoutouts: s.shoutouts
+        .filter((o) => now - o.at < 8000)
+        .map((o) => ({ ...o })),
+      fortunes: s.fortunes
+        .filter((f) => now - f.at < 10000)
+        .map((f) => ({ ...f })),
+      communityGoal: s.communityGoal && s.communityGoal.endsAt > now
+        ? { ...s.communityGoal }
+        : null,
+      sceneTime: this.getSceneTime(now),
     };
     return admin
       ? {
@@ -199,8 +241,32 @@ export class Engine {
           pendingPrayers: s.prayers
             .filter((p) => p.status === "pending")
             .map((p) => ({ ...p })),
+          fortuneList: [...(s.fortuneList ?? defaultFortuneSlips)],
+          viewerStreaks: Object.entries(s.viewerStreaks ?? {}).map(
+            ([visitorId, data]) => ({
+              visitorId,
+              visitorName: data.name,
+              currentStreak: data.streak,
+              lastVisitDate: data.lastDate,
+              title: getStreakTitle(data.streak),
+            }),
+          ),
         }
       : publicState;
+  }
+
+  private getSceneTime(now: number): Snapshot["sceneTime"] {
+    const date = new Date(now);
+    const saigonOffset = 7 * 60;
+    const utcMinutes = date.getUTCHours() * 60 + date.getUTCMinutes();
+    const saigonMinutes = utcMinutes + saigonOffset;
+    const hour = Math.floor((saigonMinutes % 1440) / 60);
+    const lunar = getLunarDay(date);
+    return {
+      period: getScenePeriod(hour),
+      isLunarSpecial: lunar.isSpecial,
+      lunarDay: lunar.day,
+    };
   }
   announcement(id: string): Announcement | undefined {
     if (
@@ -240,6 +306,143 @@ export class Engine {
         .trim() || "bạn"
     );
   }
+
+  private shoutout(userName: string, action: Shoutout["action"]) {
+    const s = this.state;
+    if (!s.settings.allEffectsEnabled || !s.settings.shoutoutsEnabled) return;
+    const now = this.now();
+    const blessings = s.blessingsList?.length
+      ? s.blessingsList
+      : defaultBlessings;
+    const blessing = blessings[Math.floor(Math.random() * blessings.length)];
+    s.shoutouts = s.shoutouts.filter((o) => now - o.at < 8000).slice(-7);
+    s.shoutouts.push({
+      id: randomUUID(),
+      at: now,
+      userName: this.safeName(userName),
+      blessing,
+      action,
+    });
+  }
+
+  private drawFortune(userId: string, userName: string): string | null {
+    const s = this.state;
+    if (!s.settings.allEffectsEnabled || !s.settings.fortuneEnabled) {
+      return null;
+    }
+    const now = this.now();
+    const cooldownMs = (s.settings.fortuneCooldownHours ?? 24) * 60 * 60 * 1000;
+    const lastDraw = s.fortuneDraws[userId];
+    if (lastDraw && now - lastDraw < cooldownMs) {
+      return null;
+    }
+    const fortunes = s.fortuneList?.length ? s.fortuneList : defaultFortuneSlips;
+    const text = fortunes[Math.floor(Math.random() * fortunes.length)];
+    s.fortuneDraws[userId] = now;
+    s.fortunes = s.fortunes.filter((f) => now - f.at < 10000).slice(-7);
+    s.fortunes.push({
+      id: randomUUID(),
+      at: now,
+      userName: this.safeName(userName),
+      text,
+    });
+    // Cleanup old fortune draws (keep last 10000)
+    const drawKeys = Object.keys(s.fortuneDraws);
+    if (drawKeys.length > 10000) {
+      const sorted = drawKeys.sort((a, b) =>
+        (s.fortuneDraws[a] ?? 0) - (s.fortuneDraws[b] ?? 0)
+      );
+      for (const key of sorted.slice(0, drawKeys.length - 10000)) {
+        delete s.fortuneDraws[key];
+      }
+    }
+    return text;
+  }
+
+  private updateStreak(userId: string, userName: string) {
+    const s = this.state;
+    if (!s.settings.allEffectsEnabled || !s.settings.streaksEnabled) return;
+    const now = new Date(this.now());
+    const saigonOffset = 7 * 60 * 60 * 1000;
+    const saigonDate = new Date(now.getTime() + saigonOffset);
+    const today = saigonDate.toISOString().split("T")[0];
+    const existing = s.viewerStreaks[userId];
+    if (existing && existing.lastDate === today) return;
+    if (existing) {
+      const yesterday = new Date(saigonDate.getTime() - 24 * 60 * 60 * 1000)
+        .toISOString()
+        .split("T")[0];
+      if (existing.lastDate === yesterday) {
+        existing.streak++;
+      } else {
+        existing.streak = 1;
+      }
+      existing.lastDate = today;
+      existing.name = userName;
+    } else {
+      s.viewerStreaks[userId] = { streak: 1, lastDate: today, name: userName };
+    }
+    // Cleanup old streaks (keep last 50000)
+    const streakKeys = Object.keys(s.viewerStreaks);
+    if (streakKeys.length > 50000) {
+      const sorted = streakKeys.sort((a, b) =>
+        (s.viewerStreaks[a]?.lastDate ?? "").localeCompare(
+          s.viewerStreaks[b]?.lastDate ?? "",
+        )
+      );
+      for (const key of sorted.slice(0, streakKeys.length - 50000)) {
+        delete s.viewerStreaks[key];
+      }
+    }
+  }
+
+  private advanceCommunityGoal(points: number) {
+    const s = this.state;
+    if (!s.settings.allEffectsEnabled || !s.settings.communityGoalEnabled) return;
+    const now = this.now();
+    if (!s.communityGoal || s.communityGoal.endsAt <= now || s.communityGoal.completed) {
+      return;
+    }
+    s.communityGoal.progress += points;
+    if (s.communityGoal.progress >= s.communityGoal.target) {
+      s.communityGoal.completed = true;
+      this.ceremony("milestone", "Hoàn thành mục tiêu cộng đồng!", 3);
+      this.announce("audience-milestone", "Chúc mừng! Cả phòng đã hoàn thành mục tiêu chung.");
+    }
+  }
+
+  startCommunityGoal() {
+    const s = this.state;
+    if (!s.settings.allEffectsEnabled || !s.settings.communityGoalEnabled) return false;
+    const now = this.now();
+    if (s.communityGoal && s.communityGoal.endsAt > now && !s.communityGoal.completed) {
+      return false;
+    }
+    this.commit(() => {
+      this.state.communityGoal = {
+        id: randomUUID(),
+        startedAt: now,
+        endsAt: now + (s.settings.communityGoalMinutes ?? 30) * 60 * 1000,
+        target: s.settings.communityGoalTarget ?? 100,
+        progress: 0,
+        completed: false,
+      };
+    });
+    return true;
+  }
+
+  stopCommunityGoal() {
+    this.commit(() => {
+      this.state.communityGoal = null;
+    });
+  }
+
+  updateFortuneList(fortunes: string[]) {
+    this.commit(() => {
+      this.state.fortuneList = fortunes.slice(0, 100);
+    });
+  }
+
   private top(board: Record<string, LeaderboardEntry>): LeaderboardEntry[] {
     return Object.values(board)
       .sort(
@@ -442,9 +645,19 @@ export class Engine {
         action = Object.hasOwn(actions, normalizedCommand)
           ? actions[normalizedCommand]
           : undefined;
-        if (command.toLowerCase() === "!sen") result = "gift-required";
-        else if (!action) result = "ignored";
-        else if (action === "prayer" && !words.join(" ").trim()) {
+        if (normalizedCommand === "!sen") {
+          result = "gift-required";
+        } else if (normalizedCommand === "!que") {
+          const fortune = this.drawFortune(event.user.id, event.user.name);
+          if (fortune) {
+            result = "fortune";
+            this.shoutout(event.user.name, "fortune");
+          } else {
+            result = "fortune-cooldown";
+          }
+        } else if (!action) {
+          result = "ignored";
+        } else if (action === "prayer" && !words.join(" ").trim()) {
           action = undefined;
           result = "empty-prayer";
         } else if (
@@ -476,6 +689,9 @@ export class Engine {
               };
               result = "pending-approval";
             }
+          } else {
+            // Add shoutout for bow and incense actions
+            this.shoutout(event.user.name, action);
           }
         }
       } else if (event.type === "gift") {
@@ -504,6 +720,18 @@ export class Engine {
           action = mapping?.action ?? "lotus";
           points = mapping?.points ?? 1;
           intensity = mapping?.intensity ?? 1;
+          // Shoutout for gifts
+          this.shoutout(event.user.name, action);
+          // Check for big gift effect
+          const totalPoints = points * count;
+          if (
+            s.settings.allEffectsEnabled &&
+            s.settings.bigGiftEffectEnabled &&
+            totalPoints >= (s.settings.bigGiftThreshold ?? 50)
+          ) {
+            // Big gift triggers a more intense celebration
+            this.ceremony("milestone", `${this.safeName(event.user.name)} đại công đức!`, 3);
+          }
         }
       } else if (event.type === "like") {
         s.totals.likes += event.count;
@@ -564,6 +792,10 @@ export class Engine {
             `Cùng nhau thắp sáng · ${newMilestones.at(-1)}`,
             3,
           );
+        // Update daily visit streaks
+        this.updateStreak(event.user.id, event.user.name);
+        // Advance community goal
+        this.advanceCommunityGoal(points * count);
       }
       // Keep long-running streams bounded while durable event IDs remain in SQLite.
       for (const map of [

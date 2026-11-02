@@ -176,6 +176,29 @@ export function createTempleApp(
     engine.newSession();
     res.json(engine.snapshot(true));
   });
+  // Community goal endpoints
+  app.post("/api/goal/start", (_req, res) => {
+    const started = engine.startCommunityGoal();
+    if (!started) {
+      res.status(400).json({ error: "Đang có mục tiêu hoặc tính năng bị tắt." });
+      return;
+    }
+    res.json(engine.snapshot(true));
+  });
+  app.post("/api/goal/stop", (_req, res) => {
+    engine.stopCommunityGoal();
+    res.json(engine.snapshot(true));
+  });
+  // Fortune list management
+  app.put("/api/fortunes", (req, res) => {
+    const { fortunes } = z
+      .object({
+        fortunes: z.array(z.string().min(1).max(200)).min(1).max(100),
+      })
+      .parse(req.body);
+    engine.updateFortuneList(fortunes);
+    res.json(engine.snapshot(true));
+  });
   app.post("/api/replay", (req, res) => {
     const { limit } = z
       .object({ limit: z.number().int().min(1).max(40).default(20) })
