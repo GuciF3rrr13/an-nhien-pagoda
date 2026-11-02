@@ -1,6 +1,19 @@
 # Project status
 
-**Phases 0–9 are complete for the local release and requested viewer-engagement extension.** Actual TikTok reception and OBS/broadcast verification remain external setup tasks.
+**Phases 0–9 are complete for the local release and requested viewer-engagement extension. Phase 10 (viewer engagement enhancements) has been implemented.** Actual TikTok reception and OBS/broadcast verification remain external setup tasks.
+
+## Phase 10: Viewer engagement features (latest)
+- **Personal shout-outs**: When viewers perform `!le`, `!nhang`, or send gifts, their name appears with a random Vietnamese blessing.
+- **Fortune draw (`!que`)**: Viewers draw random fortune slips with per-user cooldown (default 24h). Fortune list is editable in admin.
+- **Daily visit streaks**: Track consecutive days; titles at 3/7/30/100 days (Thành tâm / Đạo hữu / Đồng tu / Thiện tri thức).
+- **Community goal bar**: Room-wide target with progress bar and celebration on completion.
+- **Big gift effects**: Show giver's name prominently when points exceed threshold.
+- **Scene changes by time**: Dawn mist, dusk warmth, night ambiance, lunar special days decoration.
+- **Vietnamese TTS fallback**: Browser Web Speech API when macOS Linh voice unavailable (Linux/Windows).
+- **Global kill switch**: Disable all new effects with one toggle.
+- All features have individual ON/OFF toggles in Admin Settings, persist in SQLite, take effect without restart.
+- Checks run: `npm test` 35/35 (12 new engagement tests); `npm run build` passed; README updated with new commands.
+- PR: https://github.com/GuciF3rrr13/an-nhien-pagoda/pull/1
 
 ## Documentation update
 - Moved the existing responsibility disclaimer near the top of README for visibility; its wording is unchanged.
