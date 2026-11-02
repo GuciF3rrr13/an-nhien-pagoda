@@ -1221,7 +1221,7 @@ code {
 }
 .public-prayer {
   display: flex;
-  gap: 2cqw;
+  gap: 2.5cqw;
   align-items: flex-start;
   font-family: "Lora", serif;
   font-size: 3cqw;
@@ -1234,8 +1234,10 @@ code {
   overflow: auto;
 }
 .public-prayer > svg {
+  flex-shrink: 0;
   width: 3.5cqw;
   height: 3.5cqw;
+  min-width: 3.5cqw;
   margin-top: 1cqw;
   color: #d7ba7c;
 }

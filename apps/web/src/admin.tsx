@@ -22,6 +22,7 @@ import {
   Send,
   ShieldCheck,
   SlidersHorizontal,
+  Sparkles,
   Trash2,
   Users,
   Volume2,
@@ -93,6 +94,9 @@ const resultLabels: Record<string, string> = {
   "streak-already-counted": "Chuỗi đã ghi nhận",
   "prayer-queue-full": "Hàng chờ đầy",
   "gift-required": "Dâng hoa bằng quà tặng LIVE",
+  fortune: "Rút lá thăm",
+  "fortune-disabled": "Tính năng !que đang tắt",
+  "fortune-cooldown": "Chưa hết thời gian chờ rút thăm",
 };
 
 export function Admin() {
@@ -116,6 +120,8 @@ export function Admin() {
     [audienceCount, setAudienceCount] = useState(1000);
   const [draft, setDraft] = useState<Settings>(defaultSettings),
     [mappings, setMappings] = useState<GiftMapping[]>([]),
+    [fortuneList, setFortuneList] = useState<string[]>([]),
+    [fortuneListDirty, setFortuneListDirty] = useState(false),
     [fps, setFps] = useState(0);
   const draftDirty = useRef(false);
   const [tiktok, setTiktok] = useState<TikTokConfig>({
@@ -197,6 +203,11 @@ export function Admin() {
       );
     }
   }, [JSON.stringify(state?.mappings)]);
+  useEffect(() => {
+    if (state && !fortuneListDirty) {
+      setFortuneList(state.fortuneList ?? []);
+    }
+  }, [JSON.stringify(state?.fortuneList)]);
   useEffect(() => {
     if (!toast) return;
     const t = setTimeout(() => setToast(""), 5000);
@@ -595,6 +606,35 @@ export function Admin() {
                       <ShieldCheck size={13} />
                       Lời nguyện chỉ hiển thị sau khi được duyệt.
                     </span>
+                    {draft.fortuneEnabled && (
+                      <button
+                        className="button secondary"
+                        style={{ marginTop: 14 }}
+                        disabled={!connected || busy || !name.trim()}
+                        onClick={() =>
+                          void run(
+                            async () => {
+                              const result = await api<{ result: string }>(
+                                "events",
+                                makeEvent("comment", name, { text: "!que" }),
+                              );
+                              setToast(
+                                result.result === "fortune"
+                                  ? "Rút lá thăm thành công"
+                                  : result.result === "fortune-cooldown"
+                                    ? "Chưa hết thời gian chờ rút thăm"
+                                    : result.result === "fortune-disabled"
+                                      ? "Tính năng !que đang tắt"
+                                      : `Kết quả: ${result.result}`,
+                              );
+                            },
+                          )
+                        }
+                      >
+                        <Sparkles size={16} />
+                        Thử !que
+                      </button>
+                    )}
                     <div className="audience-simulator">
                       <label htmlFor="mock-audience-count">
                         Người xem đồng thời · mô phỏng
@@ -1047,6 +1087,22 @@ export function Admin() {
                     }
                   />
                 </label>
+                <label>
+                  Thời gian hiển thị lời nguyện (giây)
+                  <input
+                    type="number"
+                    min="10"
+                    max="600"
+                    required
+                    value={draft.prayerDisplaySeconds ?? 60}
+                    onChange={(e) =>
+                      setSetting("prayerDisplaySeconds", e.target.valueAsNumber)
+                    }
+                  />
+                </label>
+                <p className="field-hint">
+                  Lời nguyện được duyệt sẽ tự động ẩn sau thời gian này.
+                </p>
                 <label className="check-label">
                   <input
                     type="checkbox"
@@ -1133,7 +1189,8 @@ export function Admin() {
                   className="button primary"
                   disabled={!connected || busy}
                 >
-                  Lưu cài đặt
+                  <Check size={16} />
+                  Lưu trải nghiệm
                 </button>
               </form>
             </section>
@@ -1248,7 +1305,53 @@ export function Admin() {
                   type="submit"
                   disabled={!connected || busy}
                 >
-                  Lưu cài đặt hiệu ứng
+                  <Check size={16} />
+                  Lưu hiệu ứng
+                </button>
+              </form>
+            </section>
+            <section className="content-sheet">
+              <h2>Danh sách lá thăm (!que)</h2>
+              <p className="description">
+                Nội dung các lá thăm khi người xem dùng lệnh !que. Mỗi dòng là một lá thăm.
+              </p>
+              <form
+                className="settings-form"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  const cleaned = fortuneList
+                    .map((f) => f.trim())
+                    .filter((f) => f.length > 0);
+                  if (cleaned.length === 0) {
+                    setError("Danh sách lá thăm không được rỗng. Vui lòng thêm ít nhất một câu.");
+                    return;
+                  }
+                  void run(async () => {
+                    await api("fortunes", { fortunes: cleaned }, "PUT");
+                    setFortuneListDirty(false);
+                  }, "Đã lưu danh sách lá thăm.");
+                }}
+              >
+                <textarea
+                  rows={8}
+                  value={fortuneList.join("\n")}
+                  onChange={(e) => {
+                    setFortuneListDirty(true);
+                    setFortuneList(e.target.value.split("\n"));
+                  }}
+                  placeholder="Nhập mỗi câu thăm trên một dòng..."
+                  style={{ minHeight: 160 }}
+                />
+                <p className="field-hint">
+                  {fortuneList.filter((f) => f.trim()).length} lá thăm · Tối đa 100 lá, 200 ký tự mỗi lá
+                </p>
+                <button
+                  className="button primary"
+                  type="submit"
+                  disabled={!connected || busy}
+                >
+                  <Check size={16} />
+                  Lưu lá thăm
                 </button>
               </form>
             </section>
@@ -1306,7 +1409,8 @@ export function Admin() {
                   type="submit"
                   disabled={!connected || busy}
                 >
-                  Lưu cài đặt
+                  <Check size={16} />
+                  Lưu mục tiêu
                 </button>
               </form>
               <div className="inline-actions">

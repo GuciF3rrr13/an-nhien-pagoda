@@ -76,11 +76,13 @@ export function mountGame(parent: HTMLElement, client: TempleClient) {
     private reducedMotion = false;
     // New engagement visuals
     private shoutoutTexts: Phaser.GameObjects.Text[] = [];
+    private shoutoutQueue: { text: Phaser.GameObjects.Text; expiresAt: number }[] = [];
     private fortuneTexts: Phaser.GameObjects.Text[] = [];
     private seenShoutouts = new Set<string>();
     private seenFortunes = new Set<string>();
     private goalBar?: Phaser.GameObjects.Graphics;
     private goalText?: Phaser.GameObjects.Text;
+    private goalCompletedAt = 0;
     private mistOverlay?: Phaser.GameObjects.Rectangle;
     private duskOverlay?: Phaser.GameObjects.Rectangle;
     private nightOverlay?: Phaser.GameObjects.Rectangle;
@@ -88,6 +90,7 @@ export function mountGame(parent: HTMLElement, client: TempleClient) {
     private currentPeriod: Snapshot["sceneTime"]["period"] = "day";
     private bigGiftText?: Phaser.GameObjects.Text;
     private bigGiftUntil = 0;
+    private seenBigGifts = new Set<string>();
     constructor() {
       super("temple");
     }
@@ -191,27 +194,27 @@ export function mountGame(parent: HTMLElement, client: TempleClient) {
         .setDepth(2900)
         .setVisible(false);
 
-      // Community goal bar
+      // Community goal bar - positioned below header to avoid overlap (y ~ 400)
       this.goalBar = this.add.graphics().setDepth(3000);
       this.goalText = this.add
-        .text(540, 60, "", {
+        .text(540, 380, "", {
           fontFamily: '"Be Vietnam Pro"',
-          fontSize: "24px",
+          fontSize: "32px",
           color: "#fff",
-          backgroundColor: "#3a1f0dcc",
-          padding: { left: 12, right: 12, top: 6, bottom: 6 },
+          backgroundColor: "#3a1f0dee",
+          padding: { left: 16, right: 16, top: 10, bottom: 10 },
         })
         .setOrigin(0.5)
         .setDepth(3001)
         .setVisible(false);
 
-      // Big gift text
+      // Big gift text - neutral gratitude, no merit implication
       this.bigGiftText = this.add
-        .text(540, 450, "", {
+        .text(540, 520, "", {
           fontFamily: '"Be Vietnam Pro"',
-          fontSize: "56px",
+          fontSize: "52px",
           color: "#ffd700",
-          stroke: "#8b0000",
+          stroke: "#5a2d0a",
           strokeThickness: 4,
           align: "center",
         })
@@ -219,16 +222,16 @@ export function mountGame(parent: HTMLElement, client: TempleClient) {
         .setDepth(3100)
         .setVisible(false);
 
-      // Shoutout text pool
+      // Shoutout text pool - larger, more readable, positioned above hint area
       for (let i = 0; i < 4; i++) {
         this.shoutoutTexts.push(
           this.add
             .text(0, 0, "", {
               fontFamily: '"Be Vietnam Pro"',
-              fontSize: "28px",
-              color: "#fff0d1",
-              backgroundColor: "#5a2d0acc",
-              padding: { left: 10, right: 10, top: 5, bottom: 5 },
+              fontSize: "32px",
+              color: "#fff8e8",
+              backgroundColor: "#4a2510e8",
+              padding: { left: 14, right: 14, top: 8, bottom: 8 },
             })
             .setOrigin(0.5)
             .setDepth(2950)
@@ -311,12 +314,16 @@ export function mountGame(parent: HTMLElement, client: TempleClient) {
               if (c.action === "audience-milestone")
                 this.celebrateAudience(c.count, c.intensity);
               this.burst(c.action, c.intensity, c.count);
-              // Detect big gift effect by name pattern
-              if (c.action === "milestone" && c.name.includes("đại công đức")) {
-                this.showBigGift(c.name.replace(" đại công đức!", ""));
+              // Big gift effect uses dedicated "big-gift" ceremony action
+              if (c.action === "big-gift" && !this.seenBigGifts.has(c.id)) {
+                this.seenBigGifts.add(c.id);
+                this.showBigGift(c.name);
               }
             }
           }
+        // Clean up big gift tracking
+        if (this.seenBigGifts.size > 32)
+          this.seenBigGifts = new Set([...this.seenBigGifts].slice(-16));
         // Handle new shoutouts
         if (state.settings.allEffectsEnabled && state.settings.shoutoutsEnabled) {
           for (const s of state.shoutouts ?? [])
@@ -347,26 +354,44 @@ export function mountGame(parent: HTMLElement, client: TempleClient) {
     private showShoutout(shoutout: Shoutout) {
       const text = this.shoutoutTexts.find((t) => !t.visible);
       if (!text) return;
+      // Queue shoutouts vertically, stacking from bottom up at y=1480 and above
+      // Clean up expired entries from queue
+      const now = Date.now();
+      this.shoutoutQueue = this.shoutoutQueue.filter((q) => q.expiresAt > now);
+      // Find next available slot (each shoutout ~60px high with padding)
+      const slotHeight = 65;
+      const baseY = 1480;
+      const occupiedSlots = this.shoutoutQueue.map((q) =>
+        Math.round((baseY - q.text.y) / slotHeight)
+      );
+      let slot = 0;
+      while (occupiedSlots.includes(slot) && slot < 4) slot++;
+      const targetY = baseY - slot * slotHeight;
       text
-        .setText(`${shoutout.userName} · ${shoutout.blessing}`)
-        .setPosition(540, 1650 + Math.random() * 100)
+        .setText(`✨ ${shoutout.userName} · ${shoutout.blessing}`)
+        .setPosition(540, targetY + 40)
         .setAlpha(0)
         .setVisible(true);
+      const expiresAt = now + 5000;
+      this.shoutoutQueue.push({ text, expiresAt });
       this.tweens.add({
         targets: text,
         alpha: 1,
-        y: text.y - 40,
-        duration: 400,
+        y: targetY,
+        duration: 350,
         ease: "Sine.easeOut",
         onComplete: () => {
           this.tweens.add({
             targets: text,
             alpha: 0,
-            y: text.y - 30,
-            duration: 4000,
-            delay: 2500,
+            y: targetY - 25,
+            duration: 600,
+            delay: 3500,
             ease: "Sine.easeIn",
-            onComplete: () => text.setVisible(false),
+            onComplete: () => {
+              text.setVisible(false);
+              this.shoutoutQueue = this.shoutoutQueue.filter((q) => q.text !== text);
+            },
           });
         },
       });
@@ -403,8 +428,9 @@ export function mountGame(parent: HTMLElement, client: TempleClient) {
 
     private showBigGift(name: string) {
       if (!this.bigGiftText) return;
+      // Neutral gratitude wording - no merit implication
       this.bigGiftText
-        .setText(`✨ ${name} ✨\nĐại Công Đức`)
+        .setText(`✨ Cảm ơn ${name} ✨`)
         .setAlpha(0)
         .setScale(0.5)
         .setVisible(true);
@@ -438,11 +464,13 @@ export function mountGame(parent: HTMLElement, client: TempleClient) {
             )
           : action === "milestone"
             ? 90
-            : action === "like"
-              ? 8
-              : action === "share"
-                ? 16
-                : 20 * intensity;
+            : action === "big-gift"
+              ? 60
+              : action === "like"
+                ? 8
+                : action === "share"
+                  ? 16
+                  : 20 * intensity;
       let spawned = 0;
       for (const p of this.particles) {
         if (p.duration > 0) continue;
@@ -451,7 +479,8 @@ export function mountGame(parent: HTMLElement, client: TempleClient) {
         p.kind =
           action === "lotus" ||
           action === "milestone" ||
-          action === "audience-milestone"
+          action === "audience-milestone" ||
+          action === "big-gift"
             ? "petal"
             : action === "incense"
               ? "smoke"
@@ -645,7 +674,7 @@ export function mountGame(parent: HTMLElement, client: TempleClient) {
           this.lunarDecor?.setVisible(false);
         }
 
-        // Community goal bar
+        // Community goal bar - positioned below header, auto-hide after completion
         if (
           state.settings.allEffectsEnabled &&
           state.settings.communityGoalEnabled &&
@@ -658,29 +687,47 @@ export function mountGame(parent: HTMLElement, client: TempleClient) {
           const remaining = Math.max(0, goal.endsAt - state.serverTime);
           const minutes = Math.floor(remaining / 60000);
           const seconds = Math.floor((remaining % 60000) / 1000);
+          // Track when goal completed to auto-hide after 8 seconds
+          if (goal.completed && this.goalCompletedAt === 0) {
+            this.goalCompletedAt = state.serverTime;
+          }
+          // Auto-hide after 8 seconds of completion
+          const hideGoal = goal.completed &&
+            this.goalCompletedAt > 0 &&
+            state.serverTime - this.goalCompletedAt > 8000;
+          if (hideGoal) {
+            this.goalBar.clear();
+            this.goalText.setVisible(false);
+          } else {
+            // Larger, more readable bar at y=410 (below header and heading)
+            this.goalBar.clear();
+            this.goalBar.fillStyle(0x2a1508, 0.92);
+            this.goalBar.fillRoundedRect(100, 410, 880, 36, 18);
+            this.goalBar.fillStyle(goal.completed ? 0xffd700 : 0xd4763a, 1);
+            this.goalBar.fillRoundedRect(
+              104,
+              414,
+              Math.max(0, 872 * progress),
+              28,
+              14,
+            );
 
-          this.goalBar.clear();
-          this.goalBar.fillStyle(0x3a1f0d, 0.8);
-          this.goalBar.fillRoundedRect(140, 90, 800, 24, 12);
-          this.goalBar.fillStyle(goal.completed ? 0xffd700 : 0xc45c26, 1);
-          this.goalBar.fillRoundedRect(
-            142,
-            92,
-            Math.max(0, 796 * progress),
-            20,
-            10,
-          );
-
-          this.goalText
-            .setText(
-              goal.completed
-                ? "🎉 Hoàn thành mục tiêu!"
-                : `${goal.progress}/${goal.target} · Còn ${minutes}:${seconds.toString().padStart(2, "0")}`,
-            )
-            .setVisible(true);
+            this.goalText
+              .setPosition(540, 380)
+              .setText(
+                goal.completed
+                  ? "🎉 Hoàn thành mục tiêu cộng đồng!"
+                  : `🎯 ${goal.progress}/${goal.target} · Còn ${minutes}:${seconds.toString().padStart(2, "0")}`,
+              )
+              .setVisible(true);
+          }
         } else {
           this.goalBar?.clear();
           this.goalText?.setVisible(false);
+          // Reset completion timer when goal is cleared
+          if (!state.communityGoal) {
+            this.goalCompletedAt = 0;
+          }
         }
       }
       let active = 0;

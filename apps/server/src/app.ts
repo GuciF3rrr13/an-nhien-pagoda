@@ -74,12 +74,29 @@ export function createTempleApp(
       );
   };
   wss.on("connection", send);
-  engine.onChange = () => {
-    for (const client of wss.clients) send(client);
+  // Throttle WebSocket broadcasts to reduce overhead (max ~15/second)
+  let broadcastPending = false;
+  let lastBroadcast = 0;
+  const broadcastThrottleMs = 66;
+  const scheduleBroadcast = () => {
+    if (broadcastPending) return;
+    const elapsed = Date.now() - lastBroadcast;
+    if (elapsed >= broadcastThrottleMs) {
+      lastBroadcast = Date.now();
+      for (const client of wss.clients) send(client);
+    } else {
+      broadcastPending = true;
+      setTimeout(() => {
+        broadcastPending = false;
+        lastBroadcast = Date.now();
+        for (const client of wss.clients) send(client);
+      }, broadcastThrottleMs - elapsed);
+    }
   };
+  engine.onChange = scheduleBroadcast;
   const heartbeat = setInterval(() => {
     engine.tick();
-    for (const client of wss.clients) send(client);
+    scheduleBroadcast();
   }, 2000);
   let connector: LiveConnector = new MockConnector((e) => engine.ingest(e));
   let switching = false;
@@ -191,12 +208,22 @@ export function createTempleApp(
   });
   // Fortune list management
   app.put("/api/fortunes", (req, res) => {
-    const { fortunes } = z
+    const input = z
       .object({
-        fortunes: z.array(z.string().min(1).max(200)).min(1).max(100),
+        fortunes: z.array(z.string().max(200)).max(100),
       })
       .parse(req.body);
-    engine.updateFortuneList(fortunes);
+    // Trim whitespace and filter empty entries
+    const cleaned = input.fortunes
+      .map((f) => f.trim())
+      .filter((f) => f.length > 0);
+    if (cleaned.length === 0) {
+      res.status(400).json({
+        error: "Danh sách lá thăm không được rỗng. Vui lòng thêm ít nhất một câu.",
+      });
+      return;
+    }
+    engine.updateFortuneList(cleaned);
     res.json(engine.snapshot(true));
   });
   app.post("/api/replay", (req, res) => {

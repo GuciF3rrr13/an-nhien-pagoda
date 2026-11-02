@@ -218,7 +218,13 @@ export class Engine {
         .filter((c) => now - c.at < 12000)
         .map((c) => ({ ...c })),
       prayers: s.prayers
-        .filter((p) => p.status === "approved")
+        .filter((p) => {
+          if (p.status !== "approved") return false;
+          // Auto-expire approved prayers after prayerDisplaySeconds
+          const expiryMs = (s.settings.prayerDisplaySeconds ?? 60) * 1000;
+          const approvedTime = p.approvedAt ?? p.createdAt;
+          return now - approvedTime < expiryMs;
+        })
         .slice(-10)
         .map((p) => ({ ...p })),
       recent: admin ? s.recent.map((r) => ({ ...r })) : [],
@@ -325,16 +331,16 @@ export class Engine {
     });
   }
 
-  private drawFortune(userId: string, userName: string): string | null {
+  private drawFortune(userId: string, userName: string): { text: string } | "disabled" | "cooldown" {
     const s = this.state;
     if (!s.settings.allEffectsEnabled || !s.settings.fortuneEnabled) {
-      return null;
+      return "disabled";
     }
     const now = this.now();
     const cooldownMs = (s.settings.fortuneCooldownHours ?? 24) * 60 * 60 * 1000;
     const lastDraw = s.fortuneDraws[userId];
     if (lastDraw && now - lastDraw < cooldownMs) {
-      return null;
+      return "cooldown";
     }
     const fortunes = s.fortuneList?.length ? s.fortuneList : defaultFortuneSlips;
     const text = fortunes[Math.floor(Math.random() * fortunes.length)];
@@ -356,7 +362,7 @@ export class Engine {
         delete s.fortuneDraws[key];
       }
     }
-    return text;
+    return { text };
   }
 
   private updateStreak(userId: string, userName: string) {
@@ -649,11 +655,13 @@ export class Engine {
           result = "gift-required";
         } else if (normalizedCommand === "!que") {
           const fortune = this.drawFortune(event.user.id, event.user.name);
-          if (fortune) {
+          if (fortune === "disabled") {
+            result = "fortune-disabled";
+          } else if (fortune === "cooldown") {
+            result = "fortune-cooldown";
+          } else {
             result = "fortune";
             this.shoutout(event.user.name, "fortune");
-          } else {
-            result = "fortune-cooldown";
           }
         } else if (!action) {
           result = "ignored";
@@ -729,8 +737,8 @@ export class Engine {
             s.settings.bigGiftEffectEnabled &&
             totalPoints >= (s.settings.bigGiftThreshold ?? 50)
           ) {
-            // Big gift triggers a more intense celebration
-            this.ceremony("milestone", `${this.safeName(event.user.name)} đại công đức!`, 3);
+            // Big gift triggers celebration with neutral gratitude (no merit implication)
+            this.ceremony("big-gift", this.safeName(event.user.name), 3, totalPoints);
           }
         }
       } else if (event.type === "like") {
@@ -845,6 +853,9 @@ export class Engine {
     if (!prayer) return false;
     this.commit(() => {
       prayer.status = status;
+      if (status === "approved") {
+        prayer.approvedAt = this.now();
+      }
       const credit = this.state.prayerCredits[String(id)];
       if (
         status === "approved" &&

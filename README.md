@@ -122,9 +122,9 @@ Mốc 100/250/500 làm sáng thêm ánh đèn; các mốc 500 tiếp theo kích 
 
 ## Quản trị
 
-- **Lời cầu nguyện**: Duyệt hoặc Ẩn từng lời nguyện.
+- **Lời cầu nguyện**: Duyệt hoặc Ẩn từng lời nguyện. Lời nguyện được duyệt tự động ẩn sau thời gian cài đặt (mặc định 60 giây).
 - **Quà tặng**: ánh xạ mã quà thật sang hiệu ứng và điểm.
-- **Cài đặt**: âm lượng, thời gian chờ, tự chuyển góc nhìn, giọng đọc, đường dẫn OBS và kết nối TikTok.
+- **Cài đặt**: âm lượng, thời gian chờ, thời gian hiển thị lời nguyện, tự chuyển góc nhìn, giọng đọc, đường dẫn OBS và kết nối TikTok.
 - Bản xem trước trong quản trị luôn tắt tiếng. Nhạc nền phát lặp lại với thanh âm lượng nền, tiếng chuông có thanh riêng. Trên trình duyệt thường cần bấm **Bật âm thanh** ở Đạo tràng.
 - **Phát lại** tạo sự kiện thử mới từ 20 sự kiện gần nhất. Hành động hợp lệ có thể cộng điểm thêm; đây không phải chức năng khôi phục dữ liệu. Nguồn `replay` được ghi riêng trong lịch sử.
 
@@ -147,10 +147,10 @@ Một chuỗi quà hoàn tất được cảm ơn một lần, đọc tên đã 
 Các tính năng sau có thể bật/tắt độc lập trong **Cài đặt → Hiệu ứng tương tác**:
 
 - **Lời chúc (shout-out)**: Khi lễ/nhang/quà, tên người xem hiện cùng một lời chúc ngẫu nhiên trên màn hình.
-- **Rút lá thăm (`!que`)**: Người xem rút câu thơ/lời chúc ngẫu nhiên, mỗi ngày một lần (có thể chỉnh cooldown). Danh sách lá thăm chỉnh được trong quản trị.
+- **Rút lá thăm (`!que`)**: Người xem rút câu thơ/lời chúc ngẫu nhiên, mỗi ngày một lần (có thể chỉnh cooldown). Danh sách lá thăm chỉnh được trong **Cài đặt → Danh sách lá thăm**.
 - **Chuỗi ngày liên tiếp**: Theo dõi số ngày liên tiếp mỗi người xem tương tác; đạt 3/7/30/100 ngày có danh hiệu riêng (Thành tâm / Đạo hữu / Đồng tu / Thiện tri thức).
 - **Mục tiêu cộng đồng**: Đặt mục tiêu (ví dụ: 100 nhang trong 30 phút) cho cả phòng; hoàn thành kích hoạt lễ hoa sen.
-- **Hiệu ứng quà lớn**: Quà đạt ngưỡng điểm (mặc định 50) hiện tên người tặng lớn trên màn hình trong vài giây.
+- **Hiệu ứng quà lớn**: Quà đạt ngưỡng điểm (mặc định 50) hiện lời cảm ơn tên người tặng lớn trên màn hình.
 - **Cảnh theo giờ**: Cảnh chùa đổi theo giờ Việt Nam: sương sớm (5-7h), hoàng hôn (17-19h), đêm tĩnh lặng (19-5h). Ngày rằm (15) và mùng một theo âm lịch có trang trí đặc biệt.
 - **Công tắc tổng**: "Bật tất cả hiệu ứng mới" tắt toàn bộ tính năng mới, chỉ giữ chức năng cơ bản.
 

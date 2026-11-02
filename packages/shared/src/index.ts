@@ -64,6 +64,7 @@ export const settingsSchema = z.object({
   sceneByTimeEnabled: z.boolean().default(true),
   browserTTSEnabled: z.boolean().default(true),
   allEffectsEnabled: z.boolean().default(true),
+  prayerDisplaySeconds: z.number().int().min(10).max(600).default(60),
 });
 export type Settings = z.infer<typeof settingsSchema>;
 export const defaultSettings: Settings = {
@@ -86,6 +87,7 @@ export const defaultSettings: Settings = {
   sceneByTimeEnabled: true,
   browserTTSEnabled: true,
   allEffectsEnabled: true,
+  prayerDisplaySeconds: 60,
 };
 export const tiktokUsernameSchema = z
   .string()
@@ -115,6 +117,7 @@ export interface Prayer {
   text: string;
   status: "pending" | "approved" | "rejected";
   createdAt: number;
+  approvedAt?: number;
 }
 export interface Visitor {
   id: string;
@@ -129,7 +132,7 @@ export interface Visitor {
 export interface Ceremony {
   id: string;
   action:
-    Action | "milestone" | "like" | "follow" | "audience-milestone" | "share";
+    Action | "milestone" | "like" | "follow" | "audience-milestone" | "share" | "big-gift";
   name: string;
   intensity: number;
   count: number;

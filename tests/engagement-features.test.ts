@@ -158,21 +158,21 @@ test("big gift effect triggers for high-value gifts", () => {
       bigGiftThreshold: 50,
     });
     
-    // Gift below threshold - no special milestone
+    // Gift below threshold - no big-gift ceremony
     engine.ingest(gift("g1", 4, true, "s1"));
     let snapshot = engine.snapshot();
-    const milestoneCount1 = snapshot.ceremonies.filter(
-      (c) => c.action === "milestone" && c.name.includes("đại công đức")
+    const bigGiftCount1 = snapshot.ceremonies.filter(
+      (c) => c.action === "big-gift"
     ).length;
-    assert.equal(milestoneCount1, 0);
+    assert.equal(bigGiftCount1, 0);
 
-    // Gift at threshold - triggers special effect
+    // Gift at threshold - triggers big-gift ceremony
     engine.ingest(gift("g2", 5, true, "s2"));
     snapshot = engine.snapshot();
-    const milestoneCount2 = snapshot.ceremonies.filter(
-      (c) => c.action === "milestone" && c.name.includes("đại công đức")
+    const bigGiftCount2 = snapshot.ceremonies.filter(
+      (c) => c.action === "big-gift"
     ).length;
-    assert.equal(milestoneCount2, 1);
+    assert.equal(bigGiftCount2, 1);
   } finally {
     store.close();
   }
@@ -277,6 +277,38 @@ test("fortune list can be customized via API", () => {
   }
 });
 
+test("!que returns distinct results for disabled vs cooldown", () => {
+  const { store, engine, setTime } = fixture();
+  try {
+    // Test when fortune is disabled
+    engine.updateSettings({
+      ...defaultSettings,
+      fortuneEnabled: false,
+    });
+    const result1 = engine.ingest(comment("d1", "!que", "user1"));
+    assert.equal(result1.result, "fortune-disabled");
+
+    // Test successful draw
+    engine.updateSettings({
+      ...defaultSettings,
+      fortuneEnabled: true,
+      fortuneCooldownHours: 24,
+    });
+    const result2 = engine.ingest(comment("d2", "!que", "user2"));
+    assert.equal(result2.result, "fortune");
+
+    // Test cooldown - same user draws again
+    const result3 = engine.ingest(comment("d3", "!que", "user2"));
+    assert.equal(result3.result, "fortune-cooldown");
+
+    // Different user should still be able to draw
+    const result4 = engine.ingest(comment("d4", "!que", "user3"));
+    assert.equal(result4.result, "fortune");
+  } finally {
+    store.close();
+  }
+});
+
 test("snapshot includes scene time information", () => {
   const { store, engine, setTime } = fixture();
   try {
@@ -293,6 +325,36 @@ test("snapshot includes scene time information", () => {
     assert.equal(snapshot.sceneTime.period, "day");
     assert.equal(typeof snapshot.sceneTime.lunarDay, "number");
     assert.equal(typeof snapshot.sceneTime.isLunarSpecial, "boolean");
+  } finally {
+    store.close();
+  }
+});
+
+test("approved prayers auto-expire after configurable time", () => {
+  const { store, engine, setTime, advance } = fixture();
+  try {
+    engine.updateSettings({
+      ...defaultSettings,
+      prayerDisplaySeconds: 30,
+    });
+
+    // Submit and approve a prayer
+    engine.ingest(comment("p1", "!cau Bình an cho gia đình", "user1"));
+    engine.moderate(1, "approved");
+
+    // Should be visible immediately after approval
+    let snapshot = engine.snapshot();
+    assert.equal(snapshot.prayers.length, 1);
+
+    // Advance time by 29 seconds - should still be visible
+    advance(29000);
+    snapshot = engine.snapshot();
+    assert.equal(snapshot.prayers.length, 1);
+
+    // Advance past 30 seconds - should be expired
+    advance(2000);
+    snapshot = engine.snapshot();
+    assert.equal(snapshot.prayers.length, 0);
   } finally {
     store.close();
   }
