@@ -1,5 +1,11 @@
 import Phaser from "phaser";
-import type { Ceremony, Visitor } from "../../../packages/shared/src/index.ts";
+import type {
+  Ceremony,
+  FortuneSlip,
+  Shoutout,
+  Snapshot,
+  Visitor,
+} from "../../../packages/shared/src/index.ts";
 import type { TempleClient } from "./api";
 export interface GameStats {
   ready: boolean;
@@ -68,6 +74,23 @@ export function mountGame(parent: HTMLElement, client: TempleClient) {
     private audienceEndsAt = 0;
     private audienceLift = 0;
     private reducedMotion = false;
+    // New engagement visuals
+    private shoutoutTexts: Phaser.GameObjects.Text[] = [];
+    private shoutoutQueue: { text: Phaser.GameObjects.Text; expiresAt: number }[] = [];
+    private fortuneTexts: Phaser.GameObjects.Text[] = [];
+    private seenShoutouts = new Set<string>();
+    private seenFortunes = new Set<string>();
+    private goalBar?: Phaser.GameObjects.Graphics;
+    private goalText?: Phaser.GameObjects.Text;
+    private goalCompletedAt = 0;
+    private mistOverlay?: Phaser.GameObjects.Rectangle;
+    private duskOverlay?: Phaser.GameObjects.Rectangle;
+    private nightOverlay?: Phaser.GameObjects.Rectangle;
+    private lunarDecor?: Phaser.GameObjects.Text;
+    private currentPeriod: Snapshot["sceneTime"]["period"] = "day";
+    private bigGiftText?: Phaser.GameObjects.Text;
+    private bigGiftUntil = 0;
+    private seenBigGifts = new Set<string>();
     constructor() {
       super("temple");
     }
@@ -143,6 +166,98 @@ export function mountGame(parent: HTMLElement, client: TempleClient) {
           kind: "spark",
           size: 1,
         });
+
+      // Scene time overlays
+      this.mistOverlay = this.add
+        .rectangle(540, 960, 1080, 1920, 0xd4e5f7, 0)
+        .setDepth(2800)
+        .setBlendMode(Phaser.BlendModes.MULTIPLY);
+      this.duskOverlay = this.add
+        .rectangle(540, 960, 1080, 1920, 0xffb347, 0)
+        .setDepth(2800)
+        .setBlendMode(Phaser.BlendModes.MULTIPLY);
+      this.nightOverlay = this.add
+        .rectangle(540, 960, 1080, 1920, 0x1a1a2e, 0)
+        .setDepth(2800)
+        .setBlendMode(Phaser.BlendModes.MULTIPLY);
+
+      // Lunar special decoration
+      this.lunarDecor = this.add
+        .text(540, 180, "", {
+          fontFamily: '"Be Vietnam Pro"',
+          fontSize: "42px",
+          color: "#ffd700",
+          stroke: "#8b0000",
+          strokeThickness: 3,
+        })
+        .setOrigin(0.5)
+        .setDepth(2900)
+        .setVisible(false);
+
+      // Community goal bar - positioned below header to avoid overlap (y ~ 400)
+      this.goalBar = this.add.graphics().setDepth(3000);
+      this.goalText = this.add
+        .text(540, 380, "", {
+          fontFamily: '"Be Vietnam Pro"',
+          fontSize: "32px",
+          color: "#fff",
+          backgroundColor: "#3a1f0dee",
+          padding: { left: 16, right: 16, top: 10, bottom: 10 },
+        })
+        .setOrigin(0.5)
+        .setDepth(3001)
+        .setVisible(false);
+
+      // Big gift text - neutral gratitude, no merit implication
+      this.bigGiftText = this.add
+        .text(540, 520, "", {
+          fontFamily: '"Be Vietnam Pro"',
+          fontSize: "52px",
+          color: "#ffd700",
+          stroke: "#5a2d0a",
+          strokeThickness: 4,
+          align: "center",
+        })
+        .setOrigin(0.5)
+        .setDepth(3100)
+        .setVisible(false);
+
+      // Shoutout text pool - larger, more readable, positioned above hint area
+      for (let i = 0; i < 4; i++) {
+        this.shoutoutTexts.push(
+          this.add
+            .text(0, 0, "", {
+              fontFamily: '"Be Vietnam Pro"',
+              fontSize: "32px",
+              color: "#fff8e8",
+              backgroundColor: "#4a2510e8",
+              padding: { left: 14, right: 14, top: 8, bottom: 8 },
+            })
+            .setOrigin(0.5)
+            .setDepth(2950)
+            .setVisible(false),
+        );
+      }
+
+      // Fortune slip text pool
+      for (let i = 0; i < 2; i++) {
+        this.fortuneTexts.push(
+          this.add
+            .text(0, 0, "", {
+              fontFamily: '"Be Vietnam Pro"',
+              fontSize: "32px",
+              color: "#8b0000",
+              backgroundColor: "#fff8dcee",
+              padding: { left: 16, right: 16, top: 10, bottom: 10 },
+              wordWrap: { width: 600 },
+              align: "center",
+            })
+            .setOrigin(0.5)
+            .setDepth(3050)
+            .setVisible(false),
+        );
+      }
+
       this.unsubscribe = client.subscribe(() => this.sync());
       this.events.once("shutdown", () => this.unsubscribe?.());
       this.ready = true;
@@ -189,6 +304,8 @@ export function mountGame(parent: HTMLElement, client: TempleClient) {
         this.hasSnapshot = true;
         this.sessionId = state.session.id;
         this.seen = new Set(state.ceremonies.map((c) => c.id));
+        this.seenShoutouts = new Set(state.shoutouts?.map((s) => s.id) ?? []);
+        this.seenFortunes = new Set(state.fortunes?.map((f) => f.id) ?? []);
       } else {
         for (const c of state.ceremonies)
           if (!this.seen.has(c.id)) {
@@ -197,11 +314,145 @@ export function mountGame(parent: HTMLElement, client: TempleClient) {
               if (c.action === "audience-milestone")
                 this.celebrateAudience(c.count, c.intensity);
               this.burst(c.action, c.intensity, c.count);
+              // Big gift effect uses dedicated "big-gift" ceremony action
+              if (c.action === "big-gift" && !this.seenBigGifts.has(c.id)) {
+                this.seenBigGifts.add(c.id);
+                this.showBigGift(c.name);
+              }
             }
           }
+        // Clean up big gift tracking
+        if (this.seenBigGifts.size > 32)
+          this.seenBigGifts = new Set([...this.seenBigGifts].slice(-16));
+        // Handle new shoutouts
+        if (state.settings.allEffectsEnabled && state.settings.shoutoutsEnabled) {
+          for (const s of state.shoutouts ?? [])
+            if (!this.seenShoutouts.has(s.id)) {
+              this.seenShoutouts.add(s.id);
+              if (!capture && Math.abs(state.serverTime - s.at) < 2500)
+                this.showShoutout(s);
+            }
+        }
+        // Handle new fortunes
+        if (state.settings.allEffectsEnabled && state.settings.fortuneEnabled) {
+          for (const f of state.fortunes ?? [])
+            if (!this.seenFortunes.has(f.id)) {
+              this.seenFortunes.add(f.id);
+              if (!capture && Math.abs(state.serverTime - f.at) < 2500)
+                this.showFortune(f);
+            }
+        }
       }
       if (this.seen.size > 256)
         this.seen = new Set(state.ceremonies.map((c) => c.id));
+      if (this.seenShoutouts.size > 64)
+        this.seenShoutouts = new Set(state.shoutouts?.map((s) => s.id) ?? []);
+      if (this.seenFortunes.size > 32)
+        this.seenFortunes = new Set(state.fortunes?.map((f) => f.id) ?? []);
+    }
+
+    private showShoutout(shoutout: Shoutout) {
+      const text = this.shoutoutTexts.find((t) => !t.visible);
+      if (!text) return;
+      // Queue shoutouts vertically, stacking from bottom up at y=1480 and above
+      // Clean up expired entries from queue
+      const now = Date.now();
+      this.shoutoutQueue = this.shoutoutQueue.filter((q) => q.expiresAt > now);
+      // Find next available slot (each shoutout ~60px high with padding)
+      const slotHeight = 65;
+      const baseY = 1480;
+      const occupiedSlots = this.shoutoutQueue.map((q) =>
+        Math.round((baseY - q.text.y) / slotHeight)
+      );
+      let slot = 0;
+      while (occupiedSlots.includes(slot) && slot < 4) slot++;
+      const targetY = baseY - slot * slotHeight;
+      text
+        .setText(`✨ ${shoutout.userName} · ${shoutout.blessing}`)
+        .setPosition(540, targetY + 40)
+        .setAlpha(0)
+        .setVisible(true);
+      const expiresAt = now + 5000;
+      this.shoutoutQueue.push({ text, expiresAt });
+      this.tweens.add({
+        targets: text,
+        alpha: 1,
+        y: targetY,
+        duration: 350,
+        ease: "Sine.easeOut",
+        onComplete: () => {
+          this.tweens.add({
+            targets: text,
+            alpha: 0,
+            y: targetY - 25,
+            duration: 600,
+            delay: 3500,
+            ease: "Sine.easeIn",
+            onComplete: () => {
+              text.setVisible(false);
+              this.shoutoutQueue = this.shoutoutQueue.filter((q) => q.text !== text);
+            },
+          });
+        },
+      });
+    }
+
+    private showFortune(fortune: FortuneSlip) {
+      const text = this.fortuneTexts.find((t) => !t.visible);
+      if (!text) return;
+      text
+        .setText(`🎋 ${fortune.userName}\n"${fortune.text}"`)
+        .setPosition(540, 800)
+        .setAlpha(0)
+        .setScale(0.8)
+        .setVisible(true);
+      this.tweens.add({
+        targets: text,
+        alpha: 1,
+        scale: 1,
+        duration: 500,
+        ease: "Back.easeOut",
+        onComplete: () => {
+          this.tweens.add({
+            targets: text,
+            alpha: 0,
+            scale: 0.9,
+            duration: 800,
+            delay: 6000,
+            ease: "Sine.easeIn",
+            onComplete: () => text.setVisible(false),
+          });
+        },
+      });
+    }
+
+    private showBigGift(name: string) {
+      if (!this.bigGiftText) return;
+      // Neutral gratitude wording - no merit implication
+      this.bigGiftText
+        .setText(`✨ Cảm ơn ${name} ✨`)
+        .setAlpha(0)
+        .setScale(0.5)
+        .setVisible(true);
+      this.bigGiftUntil = Date.now() + 5000;
+      this.tweens.add({
+        targets: this.bigGiftText,
+        alpha: 1,
+        scale: 1,
+        duration: 600,
+        ease: "Back.easeOut",
+        onComplete: () => {
+          this.tweens.add({
+            targets: this.bigGiftText,
+            alpha: 0,
+            scale: 1.1,
+            duration: 1000,
+            delay: 3500,
+            ease: "Sine.easeIn",
+            onComplete: () => this.bigGiftText?.setVisible(false),
+          });
+        },
+      });
     }
     private burst(action: Ceremony["action"], intensity: number, count = 0) {
       const amount =
@@ -213,11 +464,13 @@ export function mountGame(parent: HTMLElement, client: TempleClient) {
             )
           : action === "milestone"
             ? 90
-            : action === "like"
-              ? 8
-              : action === "share"
-                ? 16
-                : 20 * intensity;
+            : action === "big-gift"
+              ? 60
+              : action === "like"
+                ? 8
+                : action === "share"
+                  ? 16
+                  : 20 * intensity;
       let spawned = 0;
       for (const p of this.particles) {
         if (p.duration > 0) continue;
@@ -226,7 +479,8 @@ export function mountGame(parent: HTMLElement, client: TempleClient) {
         p.kind =
           action === "lotus" ||
           action === "milestone" ||
-          action === "audience-milestone"
+          action === "audience-milestone" ||
+          action === "big-gift"
             ? "petal"
             : action === "incense"
               ? "smoke"
@@ -365,6 +619,115 @@ export function mountGame(parent: HTMLElement, client: TempleClient) {
                 now - v.actionAt < 5000,
             )
             .setDepth(2600);
+        }
+
+        // Scene time overlays
+        if (state.settings.allEffectsEnabled && state.settings.sceneByTimeEnabled) {
+          const period = state.sceneTime?.period ?? "day";
+          if (period !== this.currentPeriod) {
+            this.currentPeriod = period;
+            const targetMist = period === "dawn" ? 0.15 : 0;
+            const targetDusk = period === "dusk" ? 0.12 : 0;
+            const targetNight = period === "night" ? 0.25 : 0;
+            this.tweens.add({
+              targets: this.mistOverlay,
+              alpha: targetMist,
+              duration: 2000,
+            });
+            this.tweens.add({
+              targets: this.duskOverlay,
+              alpha: targetDusk,
+              duration: 2000,
+            });
+            this.tweens.add({
+              targets: this.nightOverlay,
+              alpha: targetNight,
+              duration: 2000,
+            });
+          }
+          // Lunar special decoration
+          if (state.sceneTime?.isLunarSpecial && this.lunarDecor) {
+            const lunarText =
+              state.sceneTime.lunarDay === 1
+                ? "🌑 Mùng Một 🌑"
+                : "🌕 Rằm 🌕";
+            if (!this.lunarDecor.visible || this.lunarDecor.text !== lunarText) {
+              this.lunarDecor.setText(lunarText).setVisible(true).setAlpha(0);
+              this.tweens.add({
+                targets: this.lunarDecor,
+                alpha: 1,
+                duration: 1000,
+              });
+            }
+          } else if (this.lunarDecor?.visible) {
+            this.tweens.add({
+              targets: this.lunarDecor,
+              alpha: 0,
+              duration: 500,
+              onComplete: () => this.lunarDecor?.setVisible(false),
+            });
+          }
+        } else {
+          this.mistOverlay?.setAlpha(0);
+          this.duskOverlay?.setAlpha(0);
+          this.nightOverlay?.setAlpha(0);
+          this.lunarDecor?.setVisible(false);
+        }
+
+        // Community goal bar - positioned below header, auto-hide after completion
+        if (
+          state.settings.allEffectsEnabled &&
+          state.settings.communityGoalEnabled &&
+          state.communityGoal &&
+          this.goalBar &&
+          this.goalText
+        ) {
+          const goal = state.communityGoal;
+          const progress = Math.min(1, goal.progress / goal.target);
+          const remaining = Math.max(0, goal.endsAt - state.serverTime);
+          const minutes = Math.floor(remaining / 60000);
+          const seconds = Math.floor((remaining % 60000) / 1000);
+          // Track when goal completed to auto-hide after 8 seconds
+          if (goal.completed && this.goalCompletedAt === 0) {
+            this.goalCompletedAt = state.serverTime;
+          }
+          // Auto-hide after 8 seconds of completion
+          const hideGoal = goal.completed &&
+            this.goalCompletedAt > 0 &&
+            state.serverTime - this.goalCompletedAt > 8000;
+          if (hideGoal) {
+            this.goalBar.clear();
+            this.goalText.setVisible(false);
+          } else {
+            // Larger, more readable bar at y=410 (below header and heading)
+            this.goalBar.clear();
+            this.goalBar.fillStyle(0x2a1508, 0.92);
+            this.goalBar.fillRoundedRect(100, 410, 880, 36, 18);
+            this.goalBar.fillStyle(goal.completed ? 0xffd700 : 0xd4763a, 1);
+            this.goalBar.fillRoundedRect(
+              104,
+              414,
+              Math.max(0, 872 * progress),
+              28,
+              14,
+            );
+
+            this.goalText
+              .setPosition(540, 380)
+              .setText(
+                goal.completed
+                  ? "🎉 Hoàn thành mục tiêu cộng đồng!"
+                  : `🎯 ${goal.progress}/${goal.target} · Còn ${minutes}:${seconds.toString().padStart(2, "0")}`,
+              )
+              .setVisible(true);
+          }
+        } else {
+          this.goalBar?.clear();
+          this.goalText?.setVisible(false);
+          // Reset completion timer when goal is cleared
+          if (!state.communityGoal) {
+            this.goalCompletedAt = 0;
+          }
         }
       }
       let active = 0;

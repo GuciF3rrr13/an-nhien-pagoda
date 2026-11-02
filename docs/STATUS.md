@@ -1,6 +1,22 @@
 # Project status
 
-**Phases 0–9 are complete for the local release and requested viewer-engagement extension.** Actual TikTok reception and OBS/broadcast verification remain external setup tasks.
+**Phases 0–9 are complete for the local release and requested viewer-engagement extension. Phase 10 (viewer engagement enhancements) has been implemented.** Actual TikTok reception and OBS/broadcast verification remain external setup tasks.
+
+## Phase 10: Viewer engagement features (latest)
+- **Personal shout-outs**: When viewers perform `!le`, `!nhang`, or send gifts, their name appears with a random Vietnamese blessing. Shout-outs queue vertically without overlapping hints.
+- **Fortune draw (`!que`)**: Viewers draw random fortune slips with per-user cooldown (default 24h). Fortune list is editable in admin via **Cài đặt → Danh sách lá thăm**. Empty/whitespace-only entries are rejected with clear Vietnamese message. Returns distinct results: `fortune-disabled` vs `fortune-cooldown` vs `fortune`.
+- **Daily visit streaks**: Track consecutive days; titles at 3/7/30/100 days (Thành tâm / Đạo hữu / Đồng tu / Thiện tri thức).
+- **Community goal bar**: Room-wide target with progress bar positioned below header, auto-hides 8 seconds after completion. Distinguished from the milestone bar.
+- **Big gift effects**: Show neutral gratitude ("Cảm ơn [name]") without merit implication when points exceed threshold.
+- **Scene changes by time**: Dawn mist, dusk warmth, night ambiance, lunar special days decoration.
+- **Vietnamese TTS fallback**: Browser Web Speech API when macOS Linh voice unavailable (Linux/Windows).
+- **Global kill switch**: Disable all new effects with one toggle.
+- **Prayer auto-expiry**: Approved prayers auto-hide after configurable time (default 60s) via new `prayerDisplaySeconds` setting.
+- All features have individual ON/OFF toggles in Admin Settings, persist in SQLite, take effect without restart. Save buttons have distinct labels ("Lưu trải nghiệm" / "Lưu hiệu ứng" / "Lưu lá thăm" / "Lưu mục tiêu").
+- WebSocket broadcasts throttled to ~15/second to improve admin preview performance.
+- Viewer instruction hint shows `!que` when enabled; admin has `!que` test button.
+- Checks run: `npm test` 37/37 (14 engagement tests including prayer expiry and fortune validation); `npm run build` passed; README updated.
+- PR: https://github.com/GuciF3rrr13/an-nhien-pagoda/pull/1
 
 ## Documentation update
 - Moved the existing responsibility disclaimer near the top of README for visibility; its wording is unchanged.

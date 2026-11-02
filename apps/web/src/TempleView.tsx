@@ -91,9 +91,11 @@ export function TempleView({
             ? "Gửi một chút yêu thương"
             : latest?.action === "follow"
               ? "Vừa ghé thăm chùa"
-              : latest
-                ? `${actionLabels[latest.action]}${latest.count > 1 ? ` ×${latest.count}` : ""}`
-                : "";
+              : latest?.action === "big-gift"
+                ? "Cảm ơn bạn"
+                : latest && latest.action in actionLabels
+                  ? `${actionLabels[latest.action as keyof typeof actionLabels]}${latest.count > 1 ? ` ×${latest.count}` : ""}`
+                  : "";
   const connectionLabel =
     state?.connector.mode === "tiktok"
       ? !client.connected
@@ -193,7 +195,8 @@ export function TempleView({
         <StreamThanks state={state} />
         <p className="stream-comment-guide">
           Bình luận <b>!le</b> · <b>!nhang</b> · <b>!cau &lt;lời nguyện&gt;</b>
-          <span>Hoa sen dành cho quà tặng LIVE.</span>
+          {state?.settings.fortuneEnabled && <> · <b>!que</b></>}
+          <span>Hoa sen dành cho quà tặng LIVE.{state?.settings.fortuneEnabled && " · !que rút lá thăm"}</span>
         </p>
         <div className="temple-progress">
           <div>
